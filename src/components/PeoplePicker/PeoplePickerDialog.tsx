@@ -157,7 +157,7 @@ const useStyles = makeStyles({
     },
   },
   rowSelected: {
-    backgroundColor: tokens.colorWarningBackground1,
+    backgroundColor: tokens.colorStatusWarningBackground1,
   },
   nameCell: {
     display: 'flex',

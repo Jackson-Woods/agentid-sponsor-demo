@@ -4,6 +4,7 @@ import type {
   DummyGroup,
   OwnerSponsorEntry,
 } from '../models/types';
+import { AgentIdentityStatus } from '../models/types';
 import {
   agentIdentities as seedAgents,
   dummyUsers as seedUsers,
@@ -214,7 +215,7 @@ export async function toggleAgentStatus(agentId: string): Promise<AgentIdentity 
   await delay(200);
   const agent = store.agents.find((a) => a.id === agentId);
   if (agent) {
-    agent.status = agent.status === 'Active' ? 'Disabled' : 'Active';
+    agent.status = agent.status === AgentIdentityStatus.Active ? AgentIdentityStatus.Disabled : AgentIdentityStatus.Active;
     saveStore(store);
   }
   return agent;
