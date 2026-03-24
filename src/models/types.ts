@@ -49,6 +49,7 @@ export interface DummyGroup {
   membershipRule?: string;
   membershipRuleProcessingState?: 'On' | 'Paused';
   isAssignableToRole?: boolean;
+  disableNesting?: boolean;
   '@odata.type': '#microsoft.graph.group';
 }
 

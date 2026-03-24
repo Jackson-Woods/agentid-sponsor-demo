@@ -11,21 +11,13 @@ import {
 } from '@fluentui/react-components';
 import {
   SearchRegular,
-  PeopleRegular,
   DismissRegular,
   DeleteRegular,
   ArrowResetRegular,
-  InfoRegular,
 } from '@fluentui/react-icons';
-import type { DummyUser, DummyGroup } from '../../models/types';
+import type { DummyUser } from '../../models/types';
 import { getAvatarColor } from '../shared/avatarUtils';
-import {
-  getAvailableOwnerUsers,
-  getAvailableSponsors,
-  searchEntities,
-} from '../../services/dataService';
-
-type FilterTab = 'all' | 'users' | 'groups';
+import { getUsers } from '../../services/dataService';
 
 const useStyles = makeStyles({
   overlay: {
@@ -77,17 +69,6 @@ const useStyles = makeStyles({
     overflow: 'hidden',
     borderRight: `1px solid ${tokens.colorNeutralStroke2}`,
   },
-  infoBanner: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '8px 12px',
-    backgroundColor: tokens.colorNeutralBackground3,
-    borderRadius: '4px',
-    fontSize: '12px',
-    color: tokens.colorNeutralForeground3,
-    marginBottom: '12px',
-  },
   searchLabel: {
     fontSize: '13px',
     fontWeight: 600,
@@ -101,29 +82,6 @@ const useStyles = makeStyles({
     fontSize: '12px',
     color: tokens.colorNeutralForeground3,
     marginBottom: '8px',
-  },
-  tabs: {
-    display: 'flex',
-    gap: '0',
-    marginBottom: '8px',
-    borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
-  },
-  tab: {
-    padding: '6px 12px',
-    fontSize: '13px',
-    cursor: 'pointer',
-    border: 'none',
-    background: 'none',
-    color: tokens.colorNeutralForeground1,
-    borderBottom: '2px solid transparent',
-    ':hover': {
-      color: tokens.colorBrandForeground1,
-    },
-  },
-  tabActive: {
-    color: tokens.colorBrandForeground1,
-    fontWeight: 600,
-    borderBottomColor: tokens.colorBrandForeground1,
   },
   tableWrapper: {
     flex: 1,
@@ -163,9 +121,6 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     gap: '18px',
-  },
-  groupAvatar: {
-    borderRadius: '6px 2px 6px 2px',
   },
   detailsCell: {
     overflow: 'hidden',
@@ -239,78 +194,57 @@ const useStyles = makeStyles({
   },
 });
 
-type PickerMode = 'owner' | 'sponsor';
-
-interface PeoplePickerDialogProps {
+interface UserPickerDialogProps {
   isOpen: boolean;
-  mode: PickerMode;
-  agentId: string;
-  prefilterSponsors?: boolean;
+  title: string;
+  subtitle: string;
+  initialSelected: DummyUser[];
   onClose: () => void;
-  onConfirm: (selected: (DummyUser | DummyGroup)[]) => void;
+  onConfirm: (selected: DummyUser[]) => void;
 }
 
-export function PeoplePickerDialog({
+export function UserPickerDialog({
   isOpen,
-  mode,
-  agentId,
-  prefilterSponsors,
+  title,
+  subtitle,
+  initialSelected,
   onClose,
   onConfirm,
-}: PeoplePickerDialogProps) {
+}: UserPickerDialogProps) {
   const styles = useStyles();
   const [searchTerm, setSearchTerm] = useState('');
-  const [entities, setEntities] = useState<(DummyUser | DummyGroup)[]>([]);
+  const [users, setUsers] = useState<DummyUser[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
-  const [filterTab, setFilterTab] = useState<FilterTab>('all');
 
   useEffect(() => {
     if (!isOpen) return;
     setSearchTerm('');
-    setSelectedIds(new Set());
-    setFilterTab('all');
+    setSelectedIds(new Set(initialSelected.map((u) => u.id)));
     setLoading(true);
 
-    const load = mode === 'owner'
-      ? getAvailableOwnerUsers(agentId)
-      : getAvailableSponsors(agentId);
-
-    load.then((data) => {
-      setEntities(data);
+    getUsers().then((data) => {
+      setUsers(data);
       setLoading(false);
     });
-  }, [isOpen, mode, agentId]);
-
-  const isUser = (e: DummyUser | DummyGroup): e is DummyUser =>
-    e['@odata.type'] === '#microsoft.graph.user';
-
-  const prefiltered = useMemo(() => {
-    if (!prefilterSponsors || mode !== 'sponsor') return entities;
-    return entities.filter((e) => {
-      if (e['@odata.type'] === '#microsoft.graph.user') return true;
-      const g = e as DummyGroup;
-      if (g.groupTypes.includes('DynamicMembership')) return true;
-      if (g.disableNesting) return true;
-      return false;
-    });
-  }, [entities, prefilterSponsors, mode]);
-
-  const searched = useMemo(
-    () => searchEntities(prefiltered, searchTerm),
-    [prefiltered, searchTerm],
-  );
+  }, [isOpen]);
 
   const filtered = useMemo(() => {
-    let list = searched;
-    if (filterTab === 'users') list = searched.filter(isUser);
-    else if (filterTab === 'groups') list = searched.filter((e) => !isUser(e));
+    let list = users;
+    if (searchTerm) {
+      const lower = searchTerm.toLowerCase();
+      list = list.filter(
+        (u) =>
+          u.displayName.toLowerCase().includes(lower) ||
+          u.mail.toLowerCase().includes(lower),
+      );
+    }
     return [...list].sort((a, b) => a.displayName.localeCompare(b.displayName));
-  }, [searched, filterTab]);
+  }, [users, searchTerm]);
 
-  const selectedEntities = useMemo(
-    () => entities.filter((e) => selectedIds.has(e.id)),
-    [entities, selectedIds],
+  const selectedUsers = useMemo(
+    () => users.filter((u) => selectedIds.has(u.id)),
+    [users, selectedIds],
   );
 
   const toggleItem = (id: string) => {
@@ -331,7 +265,7 @@ export function PeoplePickerDialog({
   };
 
   const handleConfirm = () => {
-    onConfirm(selectedEntities);
+    onConfirm(selectedUsers);
   };
 
   if (!isOpen) return null;
@@ -343,12 +277,10 @@ export function PeoplePickerDialog({
         <div className={styles.header}>
           <div>
             <Text className={styles.headerTitle} block>
-              {mode === 'owner' ? 'Add owner' : 'Add sponsor'}
+              {title}
             </Text>
             <Text className={styles.headerSubtitle} block>
-              {mode === 'owner'
-                ? 'Select users to add as owners of this agent'
-                : 'Select users to add as sponsors of this agent'}
+              {subtitle}
             </Text>
           </div>
           <Button
@@ -364,16 +296,11 @@ export function PeoplePickerDialog({
         <div className={styles.body}>
           {/* Left: search + table */}
           <div className={styles.leftPanel}>
-            <div className={styles.infoBanner}>
-              <InfoRegular fontSize={16} />
-              Try changing or adding filters if you don't see what you're looking for.
-            </div>
-
             <Text className={styles.searchLabel}>Search</Text>
             <Input
               className={styles.searchBox}
               contentBefore={<SearchRegular />}
-              placeholder="First 200 shown, search by name or email"
+              placeholder="Search by name or email"
               value={searchTerm}
               onChange={(_, d) => setSearchTerm(d.value)}
             />
@@ -381,35 +308,13 @@ export function PeoplePickerDialog({
               {filtered.length} results found
             </Text>
 
-            {/* Filter tabs */}
-            <div className={styles.tabs}>
-              <button
-                className={mergeClasses(styles.tab, filterTab === 'all' && styles.tabActive)}
-                onClick={() => setFilterTab('all')}
-              >
-                All
-              </button>
-              <button
-                className={mergeClasses(styles.tab, filterTab === 'users' && styles.tabActive)}
-                onClick={() => setFilterTab('users')}
-              >
-                Users
-              </button>
-              <button
-                className={mergeClasses(styles.tab, filterTab === 'groups' && styles.tabActive)}
-                onClick={() => setFilterTab('groups')}
-              >
-                Groups
-              </button>
-            </div>
-
             {/* Table */}
             <div className={styles.tableWrapper}>
               {loading ? (
                 <div className={styles.empty}>Loading...</div>
               ) : filtered.length === 0 ? (
                 <div className={styles.empty}>
-                  {searchTerm ? 'No results found.' : 'All available entries are already assigned.'}
+                  {searchTerm ? 'No results found.' : 'No users available.'}
                 </div>
               ) : (
                 <table className={styles.table}>
@@ -417,45 +322,37 @@ export function PeoplePickerDialog({
                     <tr>
                       <th className={styles.th} style={{ width: '32px' }}></th>
                       <th className={styles.th}>Name</th>
-                      <th className={styles.th} style={{ width: '70px' }}>Type</th>
-                      <th className={styles.th}>Details</th>
+                      <th className={styles.th}>Email</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filtered.map((entity) => {
-                      const checked = selectedIds.has(entity.id);
-                      const entityIsUser = isUser(entity);
-                      const email = entityIsUser
-                        ? entity.mail
-                        : (entity as DummyGroup).mail || '';
+                    {filtered.map((user) => {
+                      const checked = selectedIds.has(user.id);
                       return (
                         <tr
-                          key={entity.id}
+                          key={user.id}
                           className={mergeClasses(styles.row, checked && styles.rowSelected)}
-                          onClick={() => toggleItem(entity.id)}
+                          onClick={() => toggleItem(user.id)}
                         >
                           <td className={styles.td} onClick={(e) => e.stopPropagation()}>
                             <Checkbox
                               checked={checked}
-                              onChange={() => toggleItem(entity.id)}
-                              aria-label={`Select ${entity.displayName}`}
+                              onChange={() => toggleItem(user.id)}
+                              aria-label={`Select ${user.displayName}`}
                             />
                           </td>
                           <td className={styles.td}>
                             <div className={styles.nameCell}>
-                              {entityIsUser ? (
-                                <Avatar name={entity.displayName} size={32} color={getAvatarColor(entity.displayName)} />
-                              ) : (
-                                <Avatar icon={<PeopleRegular />} name={entity.displayName} size={32} color={getAvatarColor(entity.displayName)} className={styles.groupAvatar} />
-                              )}
-                              <Text>{entity.displayName}</Text>
+                              <Avatar
+                                name={user.displayName}
+                                size={32}
+                                color={getAvatarColor(user.displayName)}
+                              />
+                              <Text>{user.displayName}</Text>
                             </div>
                           </td>
                           <td className={styles.td}>
-                            {entityIsUser ? 'User' : 'Group'}
-                          </td>
-                          <td className={styles.td}>
-                            <span className={styles.detailsCell}>{email}</span>
+                            <span className={styles.detailsCell}>{user.mail}</span>
                           </td>
                         </tr>
                       );
@@ -481,53 +378,41 @@ export function PeoplePickerDialog({
               </button>
             )}
             <div className={styles.selectedList}>
-              {selectedEntities.map((entity) => {
-                const entityIsUser = isUser(entity);
-                const email = entityIsUser
-                  ? entity.mail
-                  : (entity as DummyGroup).mail || '';
-                return (
-                  <div key={entity.id} className={styles.selectedItem}>
-                    {entityIsUser ? (
-                      <Avatar name={entity.displayName} size={36} color={getAvatarColor(entity.displayName)} />
-                    ) : (
-                      <Avatar icon={<PeopleRegular />} name={entity.displayName} size={36} color={getAvatarColor(entity.displayName)} className={styles.groupAvatar} />
-                    )}
-                    <div className={styles.selectedItemInfo}>
-                      <Text className={styles.selectedItemName} block>
-                        {entity.displayName}
-                      </Text>
-                      {email && (
-                        <Text className={styles.selectedItemEmail} block>
-                          {email}
-                        </Text>
-                      )}
-                    </div>
-                    <Button
-                      appearance="subtle"
-                      icon={<DeleteRegular />}
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeItem(entity.id);
-                      }}
-                      aria-label={`Remove ${entity.displayName}`}
-                    />
+              {selectedUsers.map((user) => (
+                <div key={user.id} className={styles.selectedItem}>
+                  <Avatar
+                    name={user.displayName}
+                    size={36}
+                    color={getAvatarColor(user.displayName)}
+                  />
+                  <div className={styles.selectedItemInfo}>
+                    <Text className={styles.selectedItemName} block>
+                      {user.displayName}
+                    </Text>
+                    <Text className={styles.selectedItemEmail} block>
+                      {user.mail}
+                    </Text>
                   </div>
-                );
-              })}
+                  <Button
+                    appearance="subtle"
+                    icon={<DeleteRegular />}
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeItem(user.id);
+                    }}
+                    aria-label={`Remove ${user.displayName}`}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
         {/* Footer */}
         <div className={styles.footer}>
-          <Button
-            appearance="primary"
-            onClick={handleConfirm}
-            disabled={selectedIds.size === 0}
-          >
-            Select
+          <Button appearance="primary" onClick={handleConfirm}>
+            Confirm
           </Button>
         </div>
       </div>

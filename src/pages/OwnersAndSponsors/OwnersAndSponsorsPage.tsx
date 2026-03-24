@@ -75,7 +75,7 @@ function OwnersAndSponsorsContent({ agentId }: { agentId: string }) {
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const [pickerMode, setPickerMode] = useState<'owner' | 'sponsor' | null>(null);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
-  const { limitGroupSponsors } = useAppSettings();
+  const { limitGroupSponsors, prefilterSponsors } = useAppSettings();
   const limitGroupSponsorsRef = useRef(limitGroupSponsors);
   limitGroupSponsorsRef.current = limitGroupSponsors;
 
@@ -83,9 +83,9 @@ function OwnersAndSponsorsContent({ agentId }: { agentId: string }) {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  const showToast = useCallback((title: string, message: string) => {
+  const showToast = useCallback((title: string, message: string, variant?: 'error' | 'success') => {
     const id = `${Date.now()}-${Math.random()}`;
-    setToasts((prev) => [...prev, { id, title, message }]);
+    setToasts((prev) => [...prev, { id, title, message, variant }]);
   }, []);
 
   useEffect(() => {
@@ -113,7 +113,7 @@ function OwnersAndSponsorsContent({ agentId }: { agentId: string }) {
             const group = entity as DummyGroup;
             const groupType = getGroupTypeLabel(group);
 
-            if (groupType === 'Security') {
+            if (groupType === 'Security' && !group.disableNesting) {
               showToast(
                 'Nestable security groups not supported',
                 'Only security groups that are non-nestable can be sponsors.',
@@ -139,8 +139,10 @@ function OwnersAndSponsorsContent({ agentId }: { agentId: string }) {
       for (const entity of selected) {
         if (mode === 'owner') {
           await addOwner(agentId, entity.id);
+          showToast('Owner added', `${entity.displayName} has been added as an owner.`, 'success');
         } else {
           await addSponsor(agentId, entity.id);
+          showToast('Sponsor added', `${entity.displayName} has been added as a sponsor.`, 'success');
         }
       }
       await refreshData();
@@ -204,6 +206,7 @@ function OwnersAndSponsorsContent({ agentId }: { agentId: string }) {
         isOpen={pickerMode !== null}
         mode={pickerMode ?? 'owner'}
         agentId={agentId}
+        prefilterSponsors={prefilterSponsors}
         onClose={() => setPickerMode(null)}
         onConfirm={handlePickerConfirm}
       />

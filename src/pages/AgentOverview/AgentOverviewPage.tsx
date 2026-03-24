@@ -30,6 +30,7 @@ import {
   CheckmarkCircleFilled,
   DismissCircleFilled,
   HomeRegular,
+  InfoRegular,
   ProhibitedRegular,
   ArrowSyncRegular,
   CheckmarkRegular,
@@ -252,7 +253,7 @@ export function AgentOverviewPage() {
           </BreadcrumbItem>
         </Breadcrumb>
         <div className={styles.titleRow}>
-          <HomeRegular fontSize={28} style={{ color: tokens.colorBrandForeground1 }} />
+          <InfoRegular fontSize={28} style={{ color: tokens.colorBrandForeground1 }} />
           <Text className={styles.title}>{agent.displayName} | Overview</Text>
         </div>
         <Text className={styles.subtitle} block>

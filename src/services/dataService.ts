@@ -4,7 +4,7 @@ import type {
   DummyGroup,
   OwnerSponsorEntry,
 } from '../models/types';
-import { AgentIdentityStatus } from '../models/types';
+import { AgentIdentityStatus, getGroupTypeLabel } from '../models/types';
 import {
   agentIdentities as seedAgents,
   dummyUsers as seedUsers,
@@ -15,8 +15,10 @@ import {
 import type { AgentBlueprint } from '../models/types';
 
 const STORAGE_KEY = 'agentid-prototype';
+const STORE_VERSION = 9;
 
 interface StoreData {
+  version?: number;
   agents: AgentIdentity[];
   blueprints: AgentBlueprint[];
   users: DummyUser[];
@@ -36,6 +38,7 @@ function buildInitialStore(): StoreData {
   }
 
   return {
+    version: STORE_VERSION,
     agents: structuredClone(seedAgents),
     blueprints: structuredClone(seedBlueprints),
     users: structuredClone(seedUsers),
@@ -48,7 +51,10 @@ function buildInitialStore(): StoreData {
 function loadStore(): StoreData {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw) as StoreData;
+    if (raw) {
+      const parsed = JSON.parse(raw) as StoreData;
+      if (parsed.version === STORE_VERSION) return parsed;
+    }
   } catch {
     // corrupt data — reset
   }
@@ -257,6 +263,11 @@ export function searchEntities(
   });
 }
 
+export async function getUsers(): Promise<DummyUser[]> {
+  await delay(80);
+  return [...store.users];
+}
+
 export async function getBlueprints(): Promise<AgentBlueprint[]> {
   await delay(80);
   return [...store.blueprints];
@@ -269,4 +280,54 @@ export async function getBlueprintAgentCounts(): Promise<Record<string, number>>
     counts[bp.id] = store.agents.filter((a) => a.blueprintId === bp.id).length;
   }
   return counts;
+}
+
+// ─── Groups API ───
+
+export async function getGroups(): Promise<DummyGroup[]> {
+  await delay();
+  return [...store.groups];
+}
+
+export interface GroupStats {
+  total: number;
+  security: number;
+  m365: number;
+  dynamic: number;
+  cloudGroups: number;
+  onPremGroups: number;
+}
+
+export async function getGroupStats(): Promise<GroupStats> {
+  await delay();
+  const groups = store.groups;
+  const total = groups.length;
+  let security = 0;
+  let m365 = 0;
+  let dynamic = 0;
+  for (const g of groups) {
+    const label = getGroupTypeLabel(g);
+    if (label === 'Security' || label === 'Role-Assignable Security' || label === 'Mail-Enabled Security') security++;
+    if (label === 'Microsoft 365' || label === 'Dynamic Microsoft 365') m365++;
+    if (label === 'Dynamic Security' || label === 'Dynamic Microsoft 365') dynamic++;
+  }
+  return { total, security, m365, dynamic, cloudGroups: total, onPremGroups: 0 };
+}
+
+export async function addGroup(group: DummyGroup): Promise<DummyGroup> {
+  await delay(200);
+  store.groups.push(group);
+  saveStore(store);
+  return group;
+}
+
+export async function getGroupById(id: string): Promise<DummyGroup | undefined> {
+  await delay(80);
+  return store.groups.find((g) => g.id === id);
+}
+
+export async function deleteGroups(ids: string[]): Promise<void> {
+  await delay(200);
+  store.groups = store.groups.filter((g) => !ids.includes(g.id));
+  saveStore(store);
 }

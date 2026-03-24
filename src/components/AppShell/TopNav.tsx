@@ -39,6 +39,8 @@ const useStyles = makeStyles({
     width: '480px',
     backgroundColor: tokens.colorNeutralBackground3,
     minHeight: '32px',
+    fontSize: '14px',
+    color: tokens.colorNeutralForeground1,
   },
   userSection: {
     display: 'flex',
@@ -93,9 +95,11 @@ interface TopNavProps {
   onToggleTheme: () => void;
   limitGroupSponsors: boolean;
   onToggleLimitGroupSponsors: () => void;
+  prefilterSponsors: boolean;
+  onTogglePrefilterSponsors: () => void;
 }
 
-export function TopNav({ isDark, onToggleTheme, limitGroupSponsors, onToggleLimitGroupSponsors }: TopNavProps) {
+export function TopNav({ isDark, onToggleTheme, limitGroupSponsors, onToggleLimitGroupSponsors, prefilterSponsors, onTogglePrefilterSponsors }: TopNavProps) {
   const styles = useStyles();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const settingsRef = useRef<HTMLDivElement>(null);
@@ -143,17 +147,26 @@ export function TopNav({ isDark, onToggleTheme, limitGroupSponsors, onToggleLimi
           />
           {settingsOpen && (
             <div className={styles.settingsDropdown}>
+              <Text style={{ fontSize: '13px', fontWeight: 600, marginBottom: '4px', color: tokens.colorNeutralForeground1 }} block>Appearance</Text>
               <Switch
                 label="Dark mode"
                 labelPosition="before"
                 checked={isDark}
                 onChange={onToggleTheme}
               />
+              <Text style={{ fontSize: '13px', fontWeight: 600, marginTop: '8px', marginBottom: '4px', color: tokens.colorNeutralForeground1 }} block>Features</Text>
               <Switch
                 label="Limit group sponsors"
                 labelPosition="before"
                 checked={limitGroupSponsors}
                 onChange={onToggleLimitGroupSponsors}
+              />
+              <Switch
+                label="Prefilter sponsors"
+                labelPosition="before"
+                checked={prefilterSponsors}
+                disabled={!limitGroupSponsors}
+                onChange={onTogglePrefilterSponsors}
               />
             </div>
           )}

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { makeStyles, tokens, Text } from '@fluentui/react-components';
-import { DismissRegular, ErrorCircleFilled } from '@fluentui/react-icons';
+import { DismissRegular, ErrorCircleFilled, CheckmarkCircleFilled } from '@fluentui/react-icons';
 
 const useStyles = makeStyles({
   container: {
@@ -61,6 +61,7 @@ export interface ToastMessage {
   id: string;
   title: string;
   message: string;
+  variant?: 'error' | 'success';
 }
 
 interface ToastContainerProps {
@@ -92,7 +93,11 @@ function ToastItem({ toast, onDismiss }: { toast: ToastMessage; onDismiss: (id: 
 
   return (
     <div className={styles.toast}>
-      <ErrorCircleFilled className={styles.icon} fontSize={20} />
+      {toast.variant === 'success' ? (
+        <CheckmarkCircleFilled style={{ color: tokens.colorPaletteGreenForeground1, flexShrink: 0, marginTop: 2 }} fontSize={20} />
+      ) : (
+        <ErrorCircleFilled className={styles.icon} fontSize={20} />
+      )}
       <div className={styles.content}>
         <Text className={styles.title}>{toast.title}</Text>
         <Text className={styles.message}>{toast.message}</Text>
