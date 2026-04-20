@@ -3,7 +3,6 @@ import { makeStyles, tokens, Text, Input } from '@fluentui/react-components';
 import {
   SearchRegular,
   InfoRegular,
-  PeopleRegular,
   DataBarVerticalRegular,
   DeleteRegular,
   WrenchRegular,
@@ -14,6 +13,7 @@ import {
   PeopleQueueRegular,
   HeadsetRegular,
 } from '@fluentui/react-icons';
+import { GroupsIdentityIcon } from '../shared/SvgIcon';
 
 const useStyles = makeStyles({
   sidebar: {
@@ -87,7 +87,7 @@ export function GroupsSideMenu() {
         className={`${styles.menuItem} ${isAllGroups ? styles.active : ''}`}
         onClick={() => navigate('/groups/all')}
       >
-        <PeopleRegular className={styles.menuIcon} fontSize={16} />
+        <GroupsIdentityIcon className={styles.menuIcon} fontSize={16} />
         All groups
       </button>
       <button className={styles.menuItem}>

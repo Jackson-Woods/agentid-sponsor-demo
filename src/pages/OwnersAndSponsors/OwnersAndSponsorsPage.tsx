@@ -18,7 +18,7 @@ import { PeoplePickerDialog } from '../../components/PeoplePicker/PeoplePickerDi
 import { ToastContainer } from '../../components/shared/Toast';
 import type { ToastMessage } from '../../components/shared/Toast';
 import { addOwner, addSponsor, getAgentById } from '../../services/dataService';
-import { PeopleRegular } from '@fluentui/react-icons';
+import { GroupsIdentityIcon } from '../../components/shared/SvgIcon';
 import type { DummyUser, DummyGroup } from '../../models/types';
 import { getGroupTypeLabel } from '../../models/types';
 import { useAppSettings } from '../../AppSettingsContext';
@@ -164,7 +164,7 @@ function OwnersAndSponsorsContent({ agentId }: { agentId: string }) {
         </BreadcrumbItem>
       </Breadcrumb>
       <div className={styles.titleRow}>
-        <PeopleRegular fontSize={28} style={{ color: tokens.colorBrandForeground1 }} />
+        <GroupsIdentityIcon fontSize={28} />
         <Text className={styles.title}>{agentName ? `${agentName} | ` : ''}Owners and sponsors</Text>
       </div>
       <Text className={styles.subtitle}>

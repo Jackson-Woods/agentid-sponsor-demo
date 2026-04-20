@@ -27,6 +27,9 @@ export interface DummyUser {
   userPrincipalName: string;
   mail: string;
   userType: 'Member' | 'Guest';
+  isAgent?: boolean;
+  onPremisesSyncEnabled?: boolean;
+  identities?: string;
   '@odata.type': '#microsoft.graph.user';
 }
 

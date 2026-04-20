@@ -21,7 +21,6 @@ import {
 import {
   SearchRegular,
   AddRegular,
-  PeopleRegular,
   ArrowSyncRegular,
   ArrowDownloadRegular,
   FilterRegular,
@@ -29,6 +28,7 @@ import {
   ChatHelpRegular,
   SlideSettingsRegular,
 } from '@fluentui/react-icons';
+import { GroupsIdentityIcon } from '../../components/shared/SvgIcon';
 import { getGroups, deleteGroups } from '../../services/dataService';
 import { getAvatarColor } from '../../components/shared/avatarUtils';
 import { ToastContainer } from '../../components/shared/Toast';
@@ -302,7 +302,7 @@ export function AllGroupsPage() {
           </BreadcrumbItem>
         </Breadcrumb>
         <div className={styles.titleRow}>
-          <PeopleRegular fontSize={28} style={{ color: tokens.colorBrandForeground1 }} />
+          <GroupsIdentityIcon fontSize={28} />
           <Text className={styles.title}>Groups | All groups</Text>
         </div>
         <Text className={styles.subtitle} block>

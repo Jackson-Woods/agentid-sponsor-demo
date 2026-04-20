@@ -2,13 +2,12 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { makeStyles, tokens, Text, Input } from '@fluentui/react-components';
 import {
   InfoRegular,
-  PeopleRegular,
   BuildingRegular,
-  LockClosedRegular,
   BookRegular,
   DoorArrowLeftRegular,
   SearchRegular,
 } from '@fluentui/react-icons';
+import { GroupsIdentityIcon, VirtualNetworkGatewaysIcon } from '../shared/SvgIcon';
 
 const useStyles = makeStyles({
   sidebar: {
@@ -98,14 +97,14 @@ export function SideMenu({ agentId }: SideMenuProps) {
         onClick={() => navigate(`/agent/${agentId}/owners-sponsors`)}
         aria-current={isOwners ? 'page' : undefined}
       >
-        <PeopleRegular className={styles.menuIcon} fontSize={16} />
+        <GroupsIdentityIcon className={styles.menuIcon} fontSize={16} />
         Owners and sponsors
       </button>
       <button
         className={`${styles.menuItem}`}
         aria-current={isOwners ? 'page' : undefined}
       >
-        <LockClosedRegular className={styles.menuIcon} fontSize={16} />
+        <VirtualNetworkGatewaysIcon className={styles.menuIcon} fontSize={16} />
         Agent identity's access
       </button>
 

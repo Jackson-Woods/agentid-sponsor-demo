@@ -228,7 +228,7 @@ export function NewGroupPage() {
                 </Text>
                 <Text className={styles.hint}>
                   Turn on if you want to allow other groups to be members of this group.
-                  Some features and experiences do not support nested groups.
+                  Some features and experiences don't support nested groups.
                   This setting can't be changed after creation.
                 </Text>
               </div>

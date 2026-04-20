@@ -24,10 +24,10 @@ import {
   TableRegular,
   FilterRegular,
   GridRegular,
-  ContactCardRegular,
   CheckmarkCircleFilled,
   DismissCircleFilled,
 } from '@fluentui/react-icons';
+import { AgentCardIcon } from '../../components/shared/SvgIcon';
 import { getAgentIdentities, resetData } from '../../services/dataService';
 import { getAvatarColor } from '../../components/shared/avatarUtils';
 import { CopyButton } from '../../components/shared/CopyButton';
@@ -219,7 +219,7 @@ export function AgentListPage() {
           </BreadcrumbItem>
         </Breadcrumb>
         <div className={styles.titleRow}>
-          <ContactCardRegular fontSize={28} style={{ color: tokens.colorBrandForeground1 }} />
+          <AgentCardIcon fontSize={28} />
           <Text className={styles.title}>Agent ID | All agent identities</Text>
         </div>
         <Text className={styles.subtitle} block>

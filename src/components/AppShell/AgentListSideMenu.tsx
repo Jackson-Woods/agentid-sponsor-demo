@@ -3,11 +3,10 @@ import { makeStyles, tokens, Text, Input } from '@fluentui/react-components';
 import {
   SearchRegular,
   InfoRegular,
-  ContactCardRegular,
-  BoxRegular,
   AppsRegular,
   DoorArrowLeftRegular,
 } from '@fluentui/react-icons';
+import { AgentCardIcon, InventoryMenuIcon } from '../shared/SvgIcon';
 
 const useStyles = makeStyles({
   sidebar: {
@@ -81,11 +80,11 @@ export function AgentListSideMenu() {
         className={`${styles.menuItem} ${isAgentList ? styles.active : ''}`}
         onClick={() => navigate('/agents')}
       >
-        <ContactCardRegular className={styles.menuIcon} fontSize={16} />
+        <AgentCardIcon className={styles.menuIcon} fontSize={16} />
         All agent identities
       </button>
       <button className={`${styles.menuItem}`}>
-        <BoxRegular className={styles.menuIcon} fontSize={16} />
+        <InventoryMenuIcon className={styles.menuIcon} fontSize={16} />
         Agent registry
       </button>
       <button className={`${styles.menuItem}`}>

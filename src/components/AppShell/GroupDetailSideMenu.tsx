@@ -5,11 +5,8 @@ import {
   InfoRegular,
   WrenchRegular,
   SlideSettingsRegular,
-  PeopleRegular,
   PersonRegular,
   ShieldPersonRegular,
-  OrganizationRegular,
-  PeopleListRegular,
   AppsListRegular,
   KeyRegular,
   ShieldPersonAddRegular,
@@ -18,6 +15,7 @@ import {
   PeopleQueueRegular,
   HeadsetRegular,
 } from '@fluentui/react-icons';
+import { GroupsIdentityIcon, AdminUnitsIcon } from '../shared/SvgIcon';
 
 const useStyles = makeStyles({
   sidebar: {
@@ -103,11 +101,11 @@ export function GroupDetailSideMenu({ groupId }: { groupId: string }) {
         Properties
       </button>
       <button className={styles.menuItem}>
-        <PeopleRegular className={styles.menuIcon} fontSize={16} />
+        <GroupsIdentityIcon className={styles.menuIcon} fontSize={16} />
         Members
       </button>
       <button className={styles.menuItem}>
-        <PeopleRegular className={styles.menuIcon} fontSize={16} />
+        <GroupsIdentityIcon className={styles.menuIcon} fontSize={16} />
         Owners
       </button>
       <button className={styles.menuItem}>
@@ -115,11 +113,11 @@ export function GroupDetailSideMenu({ groupId }: { groupId: string }) {
         Roles and administrators
       </button>
       <button className={styles.menuItem}>
-        <OrganizationRegular className={styles.menuIcon} fontSize={16} />
+        <AdminUnitsIcon className={styles.menuIcon} fontSize={16} />
         Administrative units
       </button>
       <button className={styles.menuItem}>
-        <PeopleListRegular className={styles.menuIcon} fontSize={16} />
+        <GroupsIdentityIcon className={styles.menuIcon} fontSize={16} />
         Group memberships
       </button>
       <button className={styles.menuItem}>
