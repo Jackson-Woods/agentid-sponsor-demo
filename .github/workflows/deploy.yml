@@ -26,45 +26,14 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - name: Configure npm for public registry
-        run: |
-          npm config set registry https://registry.npmjs.org/
-          npm config delete //registry.npmjs.org/:_authToken || true
-      - name: Diagnostics (temporary)
-        run: |
-          echo "=== whoami / HOME ==="
-          whoami; echo "HOME=$HOME"
-          echo ""
-          echo "=== Listing potential npmrc files ==="
-          ls -la "$HOME/.npmrc" /etc/npmrc /usr/etc/npmrc ./.npmrc 2>/dev/null || true
-          echo ""
-          echo "=== Sanitized contents of any npmrc found ==="
-          for f in "$HOME/.npmrc" /etc/npmrc /usr/etc/npmrc ./.npmrc; do
-            if [ -f "$f" ]; then
-              echo "--- $f ---"
-              sed -E 's#(_authToken=|_password=|_auth=).*#\1***#g' "$f"
-            fi
-          done
-          echo ""
-          echo "=== npm config list -l (sanitized) ==="
-          npm config list -l 2>/dev/null | sed -E 's#(_authToken=|_password=|_auth=).*#\1***#g'
-          echo ""
-          echo "=== Auth-related env var NAMES (values masked) ==="
-          env | grep -Ei '^(NPM|NODE)_|TOKEN|AUTH' | sed -E 's/=.*$/=*** (masked)/' || true
-      - name: Install dependencies
-        run: |
-          ISOLATED_NPMRC="$(mktemp)"
-          echo "registry=https://registry.npmjs.org/" > "$ISOLATED_NPMRC"
-          for v in $(env | awk -F= '/^npm_config_/ {print $1}'); do unset "$v"; done
-          # Move any inherited user/global npmrc out of the way for this step
-          [ -f "$HOME/.npmrc" ] && mv "$HOME/.npmrc" "$HOME/.npmrc.bak" || true
-          npm ci --userconfig="$ISOLATED_NPMRC" --registry=https://registry.npmjs.org/ --verbose
-        env:
-          NODE_AUTH_TOKEN: ""
-          NPM_TOKEN: ""
-          NPM_CONFIG_USERCONFIG: ""
-          NPM_CONFIG_GLOBALCONFIG: ""
+      - run: npm ci
       - run: npm run build
+      - uses: actions/configure-pages@v4
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
         with:
