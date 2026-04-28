@@ -26,9 +26,20 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          registry-url: https://registry.npmjs.org
+      - name: Configure npm for public registry
+        run: |
+          npm config set registry https://registry.npmjs.org/
+          npm config set always-auth false
+          npm config delete //registry.npmjs.org/:_authToken || true
+      - name: Diagnostics (temporary)
+        run: |
+          echo "npm config (sanitized):"
+          npm config list | sed -E 's#(//[^:]+:_authToken=).*#\1***#g'
+          echo ""
+          echo "Auth-related environment variable names:"
+          env | grep -Ei '^(NPM|NODE)_|TOKEN|AUTH' | sed -E 's/=.*$/=*** (masked)/'
       - name: Install dependencies
-        run: npm ci --registry=https://registry.npmjs.org
+        run: npm ci
         env:
           NODE_AUTH_TOKEN: ""
       - run: npm run build
