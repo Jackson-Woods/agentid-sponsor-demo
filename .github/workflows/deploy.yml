@@ -32,20 +32,33 @@ jobs:
           npm config delete //registry.npmjs.org/:_authToken || true
       - name: Diagnostics (temporary)
         run: |
-          echo "npm config (sanitized):"
-          npm config list | sed -E 's#(//[^:]+:_authToken=).*#\1***#g'
+          echo "=== whoami / HOME ==="
+          whoami; echo "HOME=$HOME"
           echo ""
-          echo "Auth-related environment variable names:"
-          env | grep -Ei '^(NPM|NODE)_|TOKEN|AUTH' | sed -E 's/=.*$/=*** (masked)/'
+          echo "=== Listing potential npmrc files ==="
+          ls -la "$HOME/.npmrc" /etc/npmrc /usr/etc/npmrc ./.npmrc 2>/dev/null || true
+          echo ""
+          echo "=== Sanitized contents of any npmrc found ==="
+          for f in "$HOME/.npmrc" /etc/npmrc /usr/etc/npmrc ./.npmrc; do
+            if [ -f "$f" ]; then
+              echo "--- $f ---"
+              sed -E 's#(_authToken=|_password=|_auth=).*#\1***#g' "$f"
+            fi
+          done
+          echo ""
+          echo "=== npm config list -l (sanitized) ==="
+          npm config list -l 2>/dev/null | sed -E 's#(_authToken=|_password=|_auth=).*#\1***#g'
+          echo ""
+          echo "=== Auth-related env var NAMES (values masked) ==="
+          env | grep -Ei '^(NPM|NODE)_|TOKEN|AUTH' | sed -E 's/=.*$/=*** (masked)/' || true
       - name: Install dependencies
         run: |
-          # Use an empty, isolated npm userconfig so no inherited
-          # ~/.npmrc / runner-level auth settings can be applied.
           ISOLATED_NPMRC="$(mktemp)"
           echo "registry=https://registry.npmjs.org/" > "$ISOLATED_NPMRC"
-          # Strip any npm_config_* env vars that might inject auth
           for v in $(env | awk -F= '/^npm_config_/ {print $1}'); do unset "$v"; done
-          npm ci --userconfig="$ISOLATED_NPMRC" --registry=https://registry.npmjs.org/
+          # Move any inherited user/global npmrc out of the way for this step
+          [ -f "$HOME/.npmrc" ] && mv "$HOME/.npmrc" "$HOME/.npmrc.bak" || true
+          npm ci --userconfig="$ISOLATED_NPMRC" --registry=https://registry.npmjs.org/ --verbose
         env:
           NODE_AUTH_TOKEN: ""
           NPM_TOKEN: ""
