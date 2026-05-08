@@ -3,6 +3,10 @@ import type {
   DummyUser,
   DummyGroup,
   OwnerSponsorEntry,
+  LifecycleWorkflow,
+  WorkflowSettings,
+  AgentIdLifecyclePolicy,
+  CustomExtension,
 } from '../models/types';
 import { AgentIdentityStatus, getGroupTypeLabel } from '../models/types';
 import {
@@ -11,11 +15,15 @@ import {
   dummyGroups as seedGroups,
   agentOwnersSponsorsSeed,
   agentBlueprints as seedBlueprints,
+  lifecycleWorkflowsSeed,
+  workflowSettingsSeed,
+  agentIdPolicySeed,
+  customExtensionsSeed,
 } from '../data/seed';
 import type { AgentBlueprint } from '../models/types';
 
 const STORAGE_KEY = 'agentid-prototype';
-const STORE_VERSION = 9;
+const STORE_VERSION = 11;
 
 interface StoreData {
   version?: number;
@@ -26,6 +34,10 @@ interface StoreData {
   // Maps agentId → array of user/group IDs
   ownershipMap: Record<string, string[]>;
   sponsorshipMap: Record<string, string[]>;
+  lifecycleWorkflows: LifecycleWorkflow[];
+  workflowSettings: WorkflowSettings;
+  agentIdPolicy: AgentIdLifecyclePolicy;
+  customExtensions: CustomExtension[];
 }
 
 function buildInitialStore(): StoreData {
@@ -45,6 +57,10 @@ function buildInitialStore(): StoreData {
     groups: structuredClone(seedGroups),
     ownershipMap,
     sponsorshipMap,
+    lifecycleWorkflows: structuredClone(lifecycleWorkflowsSeed),
+    workflowSettings: structuredClone(workflowSettingsSeed),
+    agentIdPolicy: structuredClone(agentIdPolicySeed),
+    customExtensions: structuredClone(customExtensionsSeed),
   };
 }
 
@@ -330,4 +346,53 @@ export async function deleteGroups(ids: string[]): Promise<void> {
   await delay(200);
   store.groups = store.groups.filter((g) => !ids.includes(g.id));
   saveStore(store);
+}
+
+// ─── Lifecycle Workflows API ───
+
+export async function getLifecycleWorkflows(): Promise<LifecycleWorkflow[]> {
+  await delay(80);
+  return store.lifecycleWorkflows.filter((w) => !w.isDeleted);
+}
+
+export async function getDeletedLifecycleWorkflows(): Promise<LifecycleWorkflow[]> {
+  await delay(80);
+  return store.lifecycleWorkflows.filter((w) => w.isDeleted);
+}
+
+export async function getWorkflowSettings(): Promise<WorkflowSettings> {
+  await delay(60);
+  return { ...store.workflowSettings };
+}
+
+export async function updateWorkflowSettings(
+  patch: Partial<WorkflowSettings>,
+): Promise<WorkflowSettings> {
+  await delay(150);
+  store.workflowSettings = { ...store.workflowSettings, ...patch };
+  saveStore(store);
+  return { ...store.workflowSettings };
+}
+
+export async function getAgentIdPolicy(): Promise<AgentIdLifecyclePolicy> {
+  await delay(60);
+  return { ...store.agentIdPolicy };
+}
+
+export async function updateAgentIdPolicy(
+  patch: Partial<AgentIdLifecyclePolicy>,
+): Promise<AgentIdLifecyclePolicy> {
+  await delay(150);
+  store.agentIdPolicy = {
+    ...store.agentIdPolicy,
+    ...patch,
+    lastModifiedDateTime: new Date().toISOString(),
+  };
+  saveStore(store);
+  return { ...store.agentIdPolicy };
+}
+
+export async function getCustomExtensions(): Promise<CustomExtension[]> {
+  await delay(60);
+  return [...store.customExtensions];
 }

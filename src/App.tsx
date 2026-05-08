@@ -20,6 +20,10 @@ import { GroupPropertiesPage } from './pages/Groups/GroupPropertiesPage';
 import { EntitlementManagementPage } from './pages/EntitlementManagement/EntitlementManagementPage';
 import { PIMPage } from './pages/PrivilegedIdentityManagement/PIMPage';
 import { LifecycleWorkflowsPage } from './pages/LifecycleWorkflows/LifecycleWorkflowsPage';
+import { WorkflowsListPage } from './pages/LifecycleWorkflows/WorkflowsListPage';
+import { CustomExtensionsPage } from './pages/LifecycleWorkflows/CustomExtensionsPage';
+import { WorkflowSettingsPage } from './pages/LifecycleWorkflows/WorkflowSettingsPage';
+import { AgentIdPolicyPage } from './pages/LifecycleWorkflows/AgentIdPolicyPage';
 import { EnterpriseAppsPage } from './pages/EnterpriseApps/EnterpriseAppsPage';
 import { AppRegistrationsPage } from './pages/AppRegistrations/AppRegistrationsPage';
 import { AppSettingsContext } from './AppSettingsContext';
@@ -65,6 +69,10 @@ export function App() {
               <Route path="/entitlement-management" element={<EntitlementManagementPage />} />
               <Route path="/pim" element={<PIMPage />} />
               <Route path="/lifecycle-workflows" element={<LifecycleWorkflowsPage />} />
+              <Route path="/lifecycle-workflows/workflows" element={<WorkflowsListPage />} />
+              <Route path="/lifecycle-workflows/custom-extensions" element={<CustomExtensionsPage />} />
+              <Route path="/lifecycle-workflows/settings" element={<WorkflowSettingsPage />} />
+              <Route path="/lifecycle-workflows/agent-id-policy" element={<AgentIdPolicyPage />} />
               <Route path="/enterprise-apps" element={<EnterpriseAppsPage />} />
               <Route path="/app-registrations" element={<AppRegistrationsPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />

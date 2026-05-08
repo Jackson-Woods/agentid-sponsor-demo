@@ -7,6 +7,7 @@ import { AgentListSideMenu } from './AgentListSideMenu';
 import { GroupsSideMenu } from './GroupsSideMenu';
 import { GroupDetailSideMenu } from './GroupDetailSideMenu';
 import { UsersSideMenu } from './UsersSideMenu';
+import { LifecycleWorkflowsSideMenu } from './LifecycleWorkflowsSideMenu';
 import { FrameSideNav } from './FrameSideNav';
 
 const useStyles = makeStyles({
@@ -50,6 +51,7 @@ export function AppShell({ children, isDark, onToggleTheme, limitGroupSponsors, 
   const groupDetailMatch = location.pathname.match(/^\/groups\/(?!all$|new$)([^/]+)/);
   const isGroupDetail = !!groupDetailMatch;
   const isUsersPage = location.pathname === '/users';
+  const isLifecycleWorkflows = location.pathname.startsWith('/lifecycle-workflows');
 
   return (
     <div className={styles.root}>
@@ -68,6 +70,7 @@ export function AppShell({ children, isDark, onToggleTheme, limitGroupSponsors, 
         {isGroupsListPage && <GroupsSideMenu />}
         {isGroupDetail && <GroupDetailSideMenu groupId={groupDetailMatch[1]} />}
         {isUsersPage && <UsersSideMenu />}
+        {isLifecycleWorkflows && <LifecycleWorkflowsSideMenu />}
         <main className={styles.content}>{children}</main>
       </div>
     </div>

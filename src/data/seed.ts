@@ -5,6 +5,10 @@ import type {
   DummyGroup,
   SignedInUser,
   OwnerSponsorEntry,
+  LifecycleWorkflow,
+  WorkflowSettings,
+  AgentIdLifecyclePolicy,
+  CustomExtension,
 } from '../models/types';
 import { AgentIdentityStatus } from '../models/types';
 
@@ -947,3 +951,83 @@ export const agentOwnersSponsorsSeed: AgentOwnerSponsorSeed[] = [
     sponsors: [dummyUsers[1].id], // Adele
   },
 ];
+
+// ─── Lifecycle Workflows ───
+
+export const lifecycleWorkflowsSeed: LifecycleWorkflow[] = [
+  {
+    id: 'wf-employee-job-profile-change',
+    displayName: 'Employee job profile change',
+    description: 'Configure mover tasks for employees once their job profile changes',
+    category: 'Mover',
+    createdDateTime: '2026-04-08T08:21:00Z',
+    lastModifiedDateTime: '2026-04-08T08:21:00Z',
+    scheduleEnabled: false,
+  },
+  {
+    id: 'wf-offboard-agent-sponsors',
+    displayName: 'Offboard agent sponsors',
+    description: 'Execute sponsorship transition tasks when an agent sponsor leaves',
+    category: 'Leaver',
+    createdDateTime: '2026-04-20T13:50:00Z',
+    lastModifiedDateTime: '2026-04-20T13:50:00Z',
+    scheduleEnabled: false,
+  },
+  {
+    id: 'wf-offboard-an-employee',
+    displayName: 'Offboard an employee',
+    description: 'Configure offboarding tasks for employees on their last day of work',
+    category: 'Leaver',
+    createdDateTime: '2026-04-09T08:01:00Z',
+    lastModifiedDateTime: '2026-04-22T06:29:00Z',
+    scheduleEnabled: false,
+  },
+  {
+    id: 'wf-offboard-sponsor-of-agent',
+    displayName: 'Offboard sponsor of agent',
+    description: 'Configure offboarding tasks for employees, who are sponsors of agents',
+    category: 'Leaver',
+    createdDateTime: '2026-04-22T06:21:00Z',
+    lastModifiedDateTime: '2026-04-22T06:21:00Z',
+    scheduleEnabled: false,
+  },
+  {
+    id: 'wf-sponsor-of-agent-job-profile-change',
+    displayName: 'Sponsor of Agent job profile change',
+    description: 'Configure mover tasks for employees, who are sponsors of agents',
+    category: 'Mover',
+    createdDateTime: '2026-04-22T06:21:00Z',
+    lastModifiedDateTime: '2026-04-22T06:21:00Z',
+    scheduleEnabled: false,
+  },
+  {
+    id: 'wf-test-employee-job-profile-change',
+    displayName: 'test for user Employee job profile change',
+    description: 'Configure mover tasks for employees once their job profile changes',
+    category: 'Mover',
+    createdDateTime: '2026-04-08T08:22:00Z',
+    lastModifiedDateTime: '2026-04-08T08:22:00Z',
+    scheduleEnabled: false,
+  },
+];
+
+export const workflowSettingsSeed: WorkflowSettings = {
+  workflowScheduleHours: 1,
+  emailDomain: 'microsoft.com',
+  useCompanyBrandingLogo: false,
+};
+
+export const agentIdPolicySeed: AgentIdLifecyclePolicy = {
+  enabled: true,
+  createdDateTime: '2026-04-30T07:36:34',
+  lastModifiedDateTime: '2026-05-07T16:01:02',
+  scope: 'All',
+  selectedAgentIds: [],
+  reconfirmationDays: 180,
+  customizeNotificationSchedule: true,
+  firstNotificationDays: 30,
+  secondNotificationDays: 15,
+  thirdNotificationDays: 1,
+};
+
+export const customExtensionsSeed: CustomExtension[] = [];
