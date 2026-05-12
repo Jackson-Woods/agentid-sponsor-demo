@@ -16,6 +16,7 @@ import {
   TaskListLtrRegular,
   DismissRegular,
   CheckmarkCircleFilled,
+  FlowRegular,
 } from '@fluentui/react-icons';
 import { useNavigate } from 'react-router-dom';
 import type { ReactNode, ComponentType } from 'react';
@@ -94,7 +95,7 @@ const PAGE_ICONS: Record<
   string,
   ComponentType<{ fontSize?: number; style?: React.CSSProperties }>
 > = {
-  overview: ArrowSyncCircleRegular,
+  overview: FlowRegular,
   workflows: TaskListLtrRegular,
   settings: SettingsRegular,
   extensions: AppsListDetailRegular,

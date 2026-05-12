@@ -1028,6 +1028,18 @@ export const agentIdPolicySeed: AgentIdLifecyclePolicy = {
   firstNotificationDays: 30,
   secondNotificationDays: 15,
   thirdNotificationDays: 1,
+  // Default-disable (inactivity) defaults — on by default per spec.
+  inactivityDisableEnabled: true,
+  inactivityDays: 90,
+  inactivityScope: 'All',
+  inactivityExemptAgentIds: [],
+  inactivityCustomizeNotificationSchedule: true,
+  inactivityFirstNotificationDays: 30,
+  inactivitySecondNotificationDays: 15,
+  inactivityThirdNotificationDays: 1,
+  notifyOwners: false,
+  // Variant 2 integrated-mode defaults: inactivity on, reconfirmation off.
+  lifecycleModes: { reconfirm: false, inactivity: true },
 };
 
 export const customExtensionsSeed: CustomExtension[] = [];

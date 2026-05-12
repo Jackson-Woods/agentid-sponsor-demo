@@ -9,6 +9,7 @@ import { GroupDetailSideMenu } from './GroupDetailSideMenu';
 import { UsersSideMenu } from './UsersSideMenu';
 import { LifecycleWorkflowsSideMenu } from './LifecycleWorkflowsSideMenu';
 import { FrameSideNav } from './FrameSideNav';
+import type { DefaultDisableVariant } from '../../AppSettingsContext';
 
 const useStyles = makeStyles({
   root: {
@@ -37,9 +38,25 @@ interface AppShellProps {
   onToggleLimitGroupSponsors: () => void;
   prefilterSponsors: boolean;
   onTogglePrefilterSponsors: () => void;
+  showDefaultDisableUx: boolean;
+  onToggleShowDefaultDisableUx: () => void;
+  defaultDisableVariant: DefaultDisableVariant;
+  onChangeDefaultDisableVariant: (v: DefaultDisableVariant) => void;
 }
 
-export function AppShell({ children, isDark, onToggleTheme, limitGroupSponsors, onToggleLimitGroupSponsors, prefilterSponsors, onTogglePrefilterSponsors }: AppShellProps) {
+export function AppShell({
+  children,
+  isDark,
+  onToggleTheme,
+  limitGroupSponsors,
+  onToggleLimitGroupSponsors,
+  prefilterSponsors,
+  onTogglePrefilterSponsors,
+  showDefaultDisableUx,
+  onToggleShowDefaultDisableUx,
+  defaultDisableVariant,
+  onChangeDefaultDisableVariant,
+}: AppShellProps) {
   const styles = useStyles();
   const location = useLocation();
 
@@ -62,6 +79,10 @@ export function AppShell({ children, isDark, onToggleTheme, limitGroupSponsors, 
         onToggleLimitGroupSponsors={onToggleLimitGroupSponsors}
         prefilterSponsors={prefilterSponsors}
         onTogglePrefilterSponsors={onTogglePrefilterSponsors}
+        showDefaultDisableUx={showDefaultDisableUx}
+        onToggleShowDefaultDisableUx={onToggleShowDefaultDisableUx}
+        defaultDisableVariant={defaultDisableVariant}
+        onChangeDefaultDisableVariant={onChangeDefaultDisableVariant}
       />
       <div className={styles.body}>
         <FrameSideNav />

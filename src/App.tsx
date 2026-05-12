@@ -24,16 +24,29 @@ import { WorkflowsListPage } from './pages/LifecycleWorkflows/WorkflowsListPage'
 import { CustomExtensionsPage } from './pages/LifecycleWorkflows/CustomExtensionsPage';
 import { WorkflowSettingsPage } from './pages/LifecycleWorkflows/WorkflowSettingsPage';
 import { AgentIdPolicyPage } from './pages/LifecycleWorkflows/AgentIdPolicyPage';
+import { DefaultDisablePage } from './pages/LifecycleWorkflows/DefaultDisablePage';
 import { EnterpriseAppsPage } from './pages/EnterpriseApps/EnterpriseAppsPage';
 import { AppRegistrationsPage } from './pages/AppRegistrations/AppRegistrationsPage';
 import { AppSettingsContext } from './AppSettingsContext';
+import type { DefaultDisableVariant } from './AppSettingsContext';
 
 export function App() {
   const [isDark, setIsDark] = useState(false);
   const [limitGroupSponsors, setLimitGroupSponsors] = useState(false);
   const [prefilterSponsors, setPrefilterSponsors] = useState(false);
+  const [showDefaultDisableUx, setShowDefaultDisableUx] = useState(false);
+  const [defaultDisableVariant, setDefaultDisableVariant] = useState<DefaultDisableVariant>(1);
 
-  const settingsValue = useMemo(() => ({ limitGroupSponsors, prefilterSponsors, isDark }), [limitGroupSponsors, prefilterSponsors, isDark]);
+  const settingsValue = useMemo(
+    () => ({
+      limitGroupSponsors,
+      prefilterSponsors,
+      isDark,
+      showDefaultDisableUx,
+      defaultDisableVariant,
+    }),
+    [limitGroupSponsors, prefilterSponsors, isDark, showDefaultDisableUx, defaultDisableVariant],
+  );
 
   return (
     <FluentProvider theme={isDark ? webDarkTheme : webLightTheme} style={{ height: '100%' }}>
@@ -50,6 +63,10 @@ export function App() {
             })}
             prefilterSponsors={prefilterSponsors}
             onTogglePrefilterSponsors={() => setPrefilterSponsors((v) => !v)}
+            showDefaultDisableUx={showDefaultDisableUx}
+            onToggleShowDefaultDisableUx={() => setShowDefaultDisableUx((v) => !v)}
+            defaultDisableVariant={defaultDisableVariant}
+            onChangeDefaultDisableVariant={setDefaultDisableVariant}
           >
             <Routes>
               <Route path="/" element={<AgentIdOverviewPage />} />
@@ -73,6 +90,7 @@ export function App() {
               <Route path="/lifecycle-workflows/custom-extensions" element={<CustomExtensionsPage />} />
               <Route path="/lifecycle-workflows/settings" element={<WorkflowSettingsPage />} />
               <Route path="/lifecycle-workflows/agent-id-policy" element={<AgentIdPolicyPage />} />
+              <Route path="/lifecycle-workflows/default-disable" element={<DefaultDisablePage />} />
               <Route path="/enterprise-apps" element={<EnterpriseAppsPage />} />
               <Route path="/app-registrations" element={<AppRegistrationsPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />

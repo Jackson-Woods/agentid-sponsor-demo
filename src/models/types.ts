@@ -106,6 +106,20 @@ export interface AgentIdLifecyclePolicy {
   firstNotificationDays: number;
   secondNotificationDays?: number;
   thirdNotificationDays?: number;
+  // Default-disable (inactivity) policy fields. Optional so existing
+  // persisted policies stay backward compatible until STORE_VERSION bump.
+  inactivityDisableEnabled?: boolean;
+  inactivityDays?: number;
+  inactivityScope?: LifecyclePolicyScope;
+  inactivityExemptAgentIds?: string[];
+  inactivityCustomizeNotificationSchedule?: boolean;
+  inactivityFirstNotificationDays?: number;
+  inactivitySecondNotificationDays?: number;
+  inactivityThirdNotificationDays?: number;
+  notifyOwners?: boolean;
+  // Variant 2 — which lifecycle modes are active when integrated mode picker
+  // is used. Independent of variant toggle persistence.
+  lifecycleModes?: { reconfirm: boolean; inactivity: boolean };
 }
 
 export interface CustomExtension {

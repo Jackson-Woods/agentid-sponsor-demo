@@ -35,6 +35,7 @@ import {
   CheckmarkCircleRegular,
   OrganizationRegular,
   CalendarLtrRegular,
+  FlowRegular,
   LightbulbRegular,
   WrenchRegular,
   HeadsetRegular,
@@ -133,7 +134,7 @@ export const navSections: NavSection[] = [
       { label: 'Entitlement management', icon: BookRegular, route: '/entitlement-management' },
       { label: 'Access reviews', icon: CheckmarkCircleRegular },
       { label: 'Privileged Identity Management', icon: ShieldPersonRegular, route: '/pim' },
-      { label: 'Lifecycle workflows', icon: CalendarLtrRegular, route: '/lifecycle-workflows' },
+      { label: 'Lifecycle workflows', icon: FlowRegular, route: '/lifecycle-workflows' },
     ],
   },
   {

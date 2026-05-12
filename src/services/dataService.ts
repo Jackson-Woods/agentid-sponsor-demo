@@ -23,7 +23,7 @@ import {
 import type { AgentBlueprint } from '../models/types';
 
 const STORAGE_KEY = 'agentid-prototype';
-const STORE_VERSION = 11;
+const STORE_VERSION = 12;
 
 interface StoreData {
   version?: number;
