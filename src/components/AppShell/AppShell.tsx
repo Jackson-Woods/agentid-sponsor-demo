@@ -9,7 +9,7 @@ import { GroupDetailSideMenu } from './GroupDetailSideMenu';
 import { UsersSideMenu } from './UsersSideMenu';
 import { LifecycleWorkflowsSideMenu } from './LifecycleWorkflowsSideMenu';
 import { FrameSideNav } from './FrameSideNav';
-import type { DefaultDisableVariant } from '../../AppSettingsContext';
+import type { DefaultDisableVariant, ExperienceTier } from '../../AppSettingsContext';
 
 const useStyles = makeStyles({
   root: {
@@ -42,6 +42,8 @@ interface AppShellProps {
   onToggleShowDefaultDisableUx: () => void;
   defaultDisableVariant: DefaultDisableVariant;
   onChangeDefaultDisableVariant: (v: DefaultDisableVariant) => void;
+  experienceTier: ExperienceTier;
+  onChangeExperienceTier: (v: ExperienceTier) => void;
 }
 
 export function AppShell({
@@ -56,6 +58,8 @@ export function AppShell({
   onToggleShowDefaultDisableUx,
   defaultDisableVariant,
   onChangeDefaultDisableVariant,
+  experienceTier,
+  onChangeExperienceTier,
 }: AppShellProps) {
   const styles = useStyles();
   const location = useLocation();
@@ -83,6 +87,8 @@ export function AppShell({
         onToggleShowDefaultDisableUx={onToggleShowDefaultDisableUx}
         defaultDisableVariant={defaultDisableVariant}
         onChangeDefaultDisableVariant={onChangeDefaultDisableVariant}
+        experienceTier={experienceTier}
+        onChangeExperienceTier={onChangeExperienceTier}
       />
       <div className={styles.body}>
         <FrameSideNav />

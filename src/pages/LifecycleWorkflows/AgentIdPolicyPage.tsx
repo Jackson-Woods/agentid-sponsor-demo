@@ -147,7 +147,7 @@ type PickerTarget = 'reconfirm' | 'inactivity';
 
 export function AgentIdPolicyPage() {
   const styles = useStyles();
-  const { showDefaultDisableUx, defaultDisableVariant } = useAppSettings();
+  const { showDefaultDisableUx, defaultDisableVariant, experienceTier } = useAppSettings();
   const [policy, setPolicy] = useState<AgentIdLifecyclePolicy | null>(null);
   const [draft, setDraft] = useState<AgentIdLifecyclePolicy | null>(null);
   const [saving, setSaving] = useState(false);
@@ -208,6 +208,14 @@ export function AgentIdPolicyPage() {
   const modes = draft?.lifecycleModes ?? { reconfirm: true, inactivity: false };
   const anyModeOn = modes.reconfirm || modes.inactivity;
 
+  // Control disabling logic for Free experience tier
+  const isFree = experienceTier === 'free';
+  const isDefaultDisableOff = !showDefaultDisableUx;
+  const disableAllControls = isFree && isDefaultDisableOff;
+  const disableTopLevelControls = isFree && showDefaultDisableUx;
+  const disableReconfirmation = isFree && !isDefaultDisableOff;
+  const disableInactivityCustomization = isFree && !isDefaultDisableOff;
+
   return (
     <LifecyclePageHeader
       pageLabel="Agent ID (Preview)"
@@ -243,6 +251,7 @@ export function AgentIdPolicyPage() {
               <div className={styles.enableRow}>
                 <Switch
                   checked={draft.enabled}
+                  disabled={disableAllControls || disableTopLevelControls}
                   onChange={(_, d) => setDraft({ ...draft, enabled: d.checked })}
                   label="Enable lifecycle policies"
                 />
@@ -257,7 +266,7 @@ export function AgentIdPolicyPage() {
               <PolicyScopePicker
                 scope={draft.scope}
                 selectedAgentIds={draft.selectedAgentIds}
-                disabled={!draft.enabled}
+                disabled={disableAllControls || disableTopLevelControls || !draft.enabled}
                 onChangeScope={(scope) => setDraft({ ...draft, scope })}
                 onOpenPicker={() => openPicker('reconfirm')}
               />
@@ -273,7 +282,7 @@ export function AgentIdPolicyPage() {
                   className={styles.smallInput}
                   type="number"
                   min={1}
-                  disabled={!draft.enabled}
+                  disabled={disableAllControls || disableReconfirmation || !draft.enabled}
                   value={String(draft.reconfirmationDays)}
                   onChange={(_, d) => {
                     const n = parseInt(d.value, 10);
@@ -290,7 +299,7 @@ export function AgentIdPolicyPage() {
                 firstDays={draft.firstNotificationDays}
                 secondDays={draft.secondNotificationDays}
                 thirdDays={draft.thirdNotificationDays}
-                disabled={!draft.enabled}
+                disabled={disableAllControls || disableReconfirmation || !draft.enabled}
                 onChangeCustomize={(v) =>
                   setDraft({ ...draft, customizeNotificationSchedule: v })
                 }
@@ -340,6 +349,7 @@ export function AgentIdPolicyPage() {
                 />
                 <Checkbox
                   checked={modes.reconfirm}
+                  disabled={disableReconfirmation}
                   onChange={(_, d) =>
                     setDraft({
                       ...draft,
@@ -357,7 +367,7 @@ export function AgentIdPolicyPage() {
 
               <InactivityWindowPicker
                 days={draft.inactivityDays ?? 90}
-                disabled={!modes.inactivity}
+                disabled={disableInactivityCustomization || !modes.inactivity}
                 onChange={(days) => setDraft({ ...draft, inactivityDays: days })}
               />
               <ReEnableInfoBanner />
@@ -375,7 +385,7 @@ export function AgentIdPolicyPage() {
                   className={styles.smallInput}
                   type="number"
                   min={1}
-                  disabled={!modes.reconfirm}
+                  disabled={disableReconfirmation || !modes.reconfirm}
                   value={String(draft.reconfirmationDays)}
                   onChange={(_, d) => {
                     const n = parseInt(d.value, 10);
@@ -403,7 +413,7 @@ export function AgentIdPolicyPage() {
                 firstDays={draft.firstNotificationDays}
                 secondDays={draft.secondNotificationDays}
                 thirdDays={draft.thirdNotificationDays}
-                disabled={!anyModeOn}
+                disabled={disableReconfirmation || !anyModeOn}
                 onChangeCustomize={(v) =>
                   setDraft({ ...draft, customizeNotificationSchedule: v })
                 }
@@ -421,7 +431,7 @@ export function AgentIdPolicyPage() {
 
               <NotifyOwnersToggle
                 checked={draft.notifyOwners ?? false}
-                disabled={!anyModeOn}
+                disabled={disableInactivityCustomization || !anyModeOn}
                 onChange={(v) => setDraft({ ...draft, notifyOwners: v })}
               />
             </>
@@ -455,7 +465,7 @@ export function AgentIdPolicyPage() {
 
               <InactivityWindowPicker
                 days={draft.inactivityDays ?? 90}
-                disabled={!(draft.inactivityDisableEnabled ?? true)}
+                disabled={disableInactivityCustomization || !(draft.inactivityDisableEnabled ?? true)}
                 onChange={(days) => setDraft({ ...draft, inactivityDays: days })}
               />
 
@@ -475,7 +485,7 @@ export function AgentIdPolicyPage() {
                 firstDays={draft.inactivityFirstNotificationDays ?? 30}
                 secondDays={draft.inactivitySecondNotificationDays}
                 thirdDays={draft.inactivityThirdNotificationDays}
-                disabled={!(draft.inactivityDisableEnabled ?? true)}
+                disabled={disableInactivityCustomization || !(draft.inactivityDisableEnabled ?? true)}
                 onChangeCustomize={(v) =>
                   setDraft({ ...draft, inactivityCustomizeNotificationSchedule: v })
                 }
@@ -491,7 +501,7 @@ export function AgentIdPolicyPage() {
 
               <NotifyOwnersToggle
                 checked={draft.notifyOwners ?? false}
-                disabled={!(draft.inactivityDisableEnabled ?? true)}
+                disabled={disableInactivityCustomization || !(draft.inactivityDisableEnabled ?? true)}
                 onChange={(v) => setDraft({ ...draft, notifyOwners: v })}
               />
 
@@ -507,6 +517,7 @@ export function AgentIdPolicyPage() {
               <div className={styles.enableRow}>
                 <Switch
                   checked={draft.enabled}
+                  disabled={disableReconfirmation}
                   onChange={(_, d) => setDraft({ ...draft, enabled: d.checked })}
                   label="Enable periodic re-confirmation"
                 />
@@ -518,7 +529,7 @@ export function AgentIdPolicyPage() {
                   className={styles.smallInput}
                   type="number"
                   min={1}
-                  disabled={!draft.enabled}
+                  disabled={disableReconfirmation || !draft.enabled}
                   value={String(draft.reconfirmationDays)}
                   onChange={(_, d) => {
                     const n = parseInt(d.value, 10);
@@ -534,7 +545,7 @@ export function AgentIdPolicyPage() {
                 title="Re-confirmation policy scope"
                 scope={draft.scope}
                 selectedAgentIds={draft.selectedAgentIds}
-                disabled={!draft.enabled}
+                disabled={disableReconfirmation || !draft.enabled}
                 onChangeScope={(scope) => setDraft({ ...draft, scope })}
                 onOpenPicker={() => openPicker('reconfirm')}
               />
@@ -545,7 +556,7 @@ export function AgentIdPolicyPage() {
                 firstDays={draft.firstNotificationDays}
                 secondDays={draft.secondNotificationDays}
                 thirdDays={draft.thirdNotificationDays}
-                disabled={!draft.enabled}
+                disabled={disableReconfirmation || !draft.enabled}
                 onChangeCustomize={(v) =>
                   setDraft({ ...draft, customizeNotificationSchedule: v })
                 }

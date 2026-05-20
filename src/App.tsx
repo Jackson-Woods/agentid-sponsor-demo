@@ -28,7 +28,7 @@ import { DefaultDisablePage } from './pages/LifecycleWorkflows/DefaultDisablePag
 import { EnterpriseAppsPage } from './pages/EnterpriseApps/EnterpriseAppsPage';
 import { AppRegistrationsPage } from './pages/AppRegistrations/AppRegistrationsPage';
 import { AppSettingsContext } from './AppSettingsContext';
-import type { DefaultDisableVariant } from './AppSettingsContext';
+import type { DefaultDisableVariant, ExperienceTier } from './AppSettingsContext';
 
 export function App() {
   const [isDark, setIsDark] = useState(false);
@@ -36,6 +36,7 @@ export function App() {
   const [prefilterSponsors, setPrefilterSponsors] = useState(false);
   const [showDefaultDisableUx, setShowDefaultDisableUx] = useState(false);
   const [defaultDisableVariant, setDefaultDisableVariant] = useState<DefaultDisableVariant>(1);
+  const [experienceTier, setExperienceTier] = useState<ExperienceTier>('premium');
 
   const settingsValue = useMemo(
     () => ({
@@ -44,8 +45,16 @@ export function App() {
       isDark,
       showDefaultDisableUx,
       defaultDisableVariant,
+      experienceTier,
     }),
-    [limitGroupSponsors, prefilterSponsors, isDark, showDefaultDisableUx, defaultDisableVariant],
+    [
+      limitGroupSponsors,
+      prefilterSponsors,
+      isDark,
+      showDefaultDisableUx,
+      defaultDisableVariant,
+      experienceTier,
+    ],
   );
 
   return (
@@ -67,6 +76,8 @@ export function App() {
             onToggleShowDefaultDisableUx={() => setShowDefaultDisableUx((v) => !v)}
             defaultDisableVariant={defaultDisableVariant}
             onChangeDefaultDisableVariant={setDefaultDisableVariant}
+            experienceTier={experienceTier}
+            onChangeExperienceTier={setExperienceTier}
           >
             <Routes>
               <Route path="/" element={<AgentIdOverviewPage />} />

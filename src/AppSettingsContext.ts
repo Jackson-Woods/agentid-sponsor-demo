@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 
 export type DefaultDisableVariant = 1 | 2 | 3;
+export type ExperienceTier = 'free' | 'premium';
 
 interface AppSettings {
   limitGroupSponsors: boolean;
@@ -8,6 +9,7 @@ interface AppSettings {
   isDark: boolean;
   showDefaultDisableUx: boolean;
   defaultDisableVariant: DefaultDisableVariant;
+  experienceTier: ExperienceTier;
 }
 
 export const AppSettingsContext = createContext<AppSettings>({
@@ -16,6 +18,7 @@ export const AppSettingsContext = createContext<AppSettings>({
   isDark: false,
   showDefaultDisableUx: false,
   defaultDisableVariant: 1,
+  experienceTier: 'premium',
 });
 
 export function useAppSettings() {

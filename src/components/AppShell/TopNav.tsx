@@ -8,7 +8,7 @@ import {
   GridDotsRegular,
 } from '@fluentui/react-icons';
 import { signedInUser } from '../../data/seed';
-import type { DefaultDisableVariant } from '../../AppSettingsContext';
+import type { DefaultDisableVariant, ExperienceTier } from '../../AppSettingsContext';
 
 const useStyles = makeStyles({
   header: {
@@ -102,6 +102,8 @@ interface TopNavProps {
   onToggleShowDefaultDisableUx: () => void;
   defaultDisableVariant: DefaultDisableVariant;
   onChangeDefaultDisableVariant: (v: DefaultDisableVariant) => void;
+  experienceTier: ExperienceTier;
+  onChangeExperienceTier: (v: ExperienceTier) => void;
 }
 
 export function TopNav({
@@ -115,6 +117,8 @@ export function TopNav({
   onToggleShowDefaultDisableUx,
   defaultDisableVariant,
   onChangeDefaultDisableVariant,
+  experienceTier,
+  onChangeExperienceTier,
 }: TopNavProps) {
   const styles = useStyles();
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -163,7 +167,19 @@ export function TopNav({
           />
           {settingsOpen && (
             <div className={styles.settingsDropdown}>
-              <Text style={{ fontSize: '13px', fontWeight: 600, marginBottom: '4px', color: tokens.colorNeutralForeground1 }} block>Appearance</Text>
+              <Text style={{ fontSize: '13px', fontWeight: 600, marginBottom: '4px', color: tokens.colorNeutralForeground1 }} block>Experience</Text>
+              <RadioGroup
+                value={experienceTier}
+                onChange={(_, d) => {
+                  if (d.value === 'free' || d.value === 'premium') {
+                    onChangeExperienceTier(d.value);
+                  }
+                }}
+              >
+                <Radio value="free" label="Free" />
+                <Radio value="premium" label="Premium" />
+              </RadioGroup>
+              <Text style={{ fontSize: '13px', fontWeight: 600, marginTop: '8px', marginBottom: '4px', color: tokens.colorNeutralForeground1 }} block>Appearance</Text>
               <Switch
                 label="Dark mode"
                 labelPosition="before"

@@ -15,6 +15,7 @@ import {
   updateAgentIdPolicy,
 } from '../../services/dataService';
 import { AgentPickerDialog } from '../../components/PeoplePicker/AgentPickerDialog';
+import { useAppSettings } from '../../AppSettingsContext';
 import type { AgentIdLifecyclePolicy } from '../../models/types';
 import { PolicyScopePicker } from './policyParts/PolicyScopePicker';
 import { NotificationScheduleEditor } from './policyParts/NotificationScheduleEditor';
@@ -89,6 +90,7 @@ function formatPolicyDate(iso: string): string {
 
 export function DefaultDisablePage() {
   const styles = useStyles();
+  const { experienceTier } = useAppSettings();
   const [policy, setPolicy] = useState<AgentIdLifecyclePolicy | null>(null);
   const [draft, setDraft] = useState<AgentIdLifecyclePolicy | null>(null);
   const [saving, setSaving] = useState(false);
@@ -121,6 +123,10 @@ export function DefaultDisablePage() {
   const handleDiscard = () => setDraft(policy);
 
   const enabled = draft?.inactivityDisableEnabled ?? true;
+
+  // Control disabling logic for Free experience tier
+  const isFree = experienceTier === 'free';
+  const disableInactivityCustomization = isFree;
 
   return (
     <LifecyclePageHeader
@@ -169,7 +175,7 @@ export function DefaultDisablePage() {
 
           <InactivityWindowPicker
             days={draft.inactivityDays ?? 90}
-            disabled={!enabled}
+            disabled={disableInactivityCustomization || !enabled}
             onChange={(days) => setDraft({ ...draft, inactivityDays: days })}
           />
 
@@ -189,7 +195,7 @@ export function DefaultDisablePage() {
             firstDays={draft.inactivityFirstNotificationDays ?? 30}
             secondDays={draft.inactivitySecondNotificationDays}
             thirdDays={draft.inactivityThirdNotificationDays}
-            disabled={!enabled}
+            disabled={disableInactivityCustomization || !enabled}
             onChangeCustomize={(v) =>
               setDraft({ ...draft, inactivityCustomizeNotificationSchedule: v })
             }
@@ -206,7 +212,7 @@ export function DefaultDisablePage() {
 
           <NotifyOwnersToggle
             checked={draft.notifyOwners ?? false}
-            disabled={!enabled}
+            disabled={disableInactivityCustomization || !enabled}
             onChange={(v) => setDraft({ ...draft, notifyOwners: v })}
           />
 
