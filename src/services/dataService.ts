@@ -5,6 +5,7 @@ import type {
   OwnerSponsorEntry,
   LifecycleWorkflow,
   WorkflowSettings,
+  AgentLifecyclePolicy,
   AgentIdLifecyclePolicy,
   CustomExtension,
 } from '../models/types';
@@ -17,6 +18,7 @@ import {
   agentBlueprints as seedBlueprints,
   lifecycleWorkflowsSeed,
   workflowSettingsSeed,
+  agentLifecyclePoliciesSeed,
   agentIdPolicySeed,
   customExtensionsSeed,
 } from '../data/seed';
@@ -36,6 +38,7 @@ interface StoreData {
   sponsorshipMap: Record<string, string[]>;
   lifecycleWorkflows: LifecycleWorkflow[];
   workflowSettings: WorkflowSettings;
+  agentLifecyclePolicies: AgentLifecyclePolicy[];
   agentIdPolicy: AgentIdLifecyclePolicy;
   customExtensions: CustomExtension[];
 }
@@ -59,6 +62,7 @@ function buildInitialStore(): StoreData {
     sponsorshipMap,
     lifecycleWorkflows: structuredClone(lifecycleWorkflowsSeed),
     workflowSettings: structuredClone(workflowSettingsSeed),
+    agentLifecyclePolicies: structuredClone(agentLifecyclePoliciesSeed),
     agentIdPolicy: structuredClone(agentIdPolicySeed),
     customExtensions: structuredClone(customExtensionsSeed),
   };
@@ -69,7 +73,13 @@ function loadStore(): StoreData {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as StoreData;
-      if (parsed.version === STORE_VERSION) return parsed;
+      if (parsed.version === STORE_VERSION) {
+        if (!parsed.agentLifecyclePolicies) {
+          parsed.agentLifecyclePolicies = structuredClone(agentLifecyclePoliciesSeed);
+          saveStore(parsed);
+        }
+        return parsed;
+      }
     }
   } catch {
     // corrupt data — reset
@@ -380,6 +390,49 @@ export async function getAgentIdPolicy(): Promise<AgentIdLifecyclePolicy> {
     ...store.agentIdPolicy,
     selectedAgentIds: [...store.agentIdPolicy.selectedAgentIds],
   };
+}
+
+export async function getAgentLifecyclePolicies(): Promise<AgentLifecyclePolicy[]> {
+  await delay(60);
+  return structuredClone(store.agentLifecyclePolicies);
+}
+
+export async function createAgentLifecyclePolicy(
+  input: Pick<AgentLifecyclePolicy, 'name' | 'enabled' | 'scope' | 'selectedAgentIds'>,
+): Promise<AgentLifecyclePolicy> {
+  await delay(150);
+  const now = new Date().toISOString();
+  const policy: AgentLifecyclePolicy = {
+    ...input,
+    id: crypto.randomUUID(),
+    description: 'Custom agent lifecycle policy.',
+    selectedAgentIds: [...input.selectedAgentIds],
+    createdDateTime: now,
+    lastModifiedDateTime: now,
+  };
+  store.agentLifecyclePolicies.push(policy);
+  saveStore(store);
+  return structuredClone(policy);
+}
+
+export async function moveAgentLifecyclePolicy(
+  policyId: string,
+  direction: 'up' | 'down',
+): Promise<AgentLifecyclePolicy[]> {
+  await delay(100);
+  const currentIndex = store.agentLifecyclePolicies.findIndex((policy) => policy.id === policyId);
+  const nextIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+  if (
+    currentIndex < 0 ||
+    nextIndex < 0 ||
+    nextIndex >= store.agentLifecyclePolicies.length
+  ) {
+    return structuredClone(store.agentLifecyclePolicies);
+  }
+  const [policy] = store.agentLifecyclePolicies.splice(currentIndex, 1);
+  store.agentLifecyclePolicies.splice(nextIndex, 0, policy);
+  saveStore(store);
+  return structuredClone(store.agentLifecyclePolicies);
 }
 
 export async function updateAgentIdPolicy(

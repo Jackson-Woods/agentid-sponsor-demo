@@ -127,10 +127,20 @@ const useStyles = makeStyles({
   },
 });
 
-export function AgentLifecyclePolicyDetailsPage() {
+interface AgentLifecyclePolicyDetailsPageProps {
+  returnPath?: string;
+  requireAgentsFeature?: boolean;
+  requirePremium?: boolean;
+}
+
+export function AgentLifecyclePolicyDetailsPage({
+  returnPath = '/agents/lifecycle-policy',
+  requireAgentsFeature = true,
+  requirePremium = false,
+}: AgentLifecyclePolicyDetailsPageProps) {
   const styles = useStyles();
   const navigate = useNavigate();
-  const { showDefaultDisableUx } = useAppSettings();
+  const { experienceTier, showDefaultDisableUx } = useAppSettings();
   const [policy, setPolicy] = useState<AgentIdLifecyclePolicy | null>(null);
   const [draft, setDraft] = useState<AgentIdLifecyclePolicy | null>(null);
   const [saving, setSaving] = useState(false);
@@ -146,8 +156,12 @@ export function AgentLifecyclePolicyDetailsPage() {
     load();
   }, []);
 
-  if (!showDefaultDisableUx) {
+  if (requireAgentsFeature && !showDefaultDisableUx) {
     return <Navigate to="/" replace />;
+  }
+
+  if (requirePremium && experienceTier !== 'premium') {
+    return <Navigate to={returnPath} replace />;
   }
 
   const isDirty =
@@ -162,7 +176,7 @@ export function AgentLifecyclePolicyDetailsPage() {
     setPolicy(updated);
     setDraft(updated);
     setSaving(false);
-    navigate('/agents/lifecycle-policy');
+    navigate(returnPath);
   };
 
   return (
@@ -194,7 +208,7 @@ export function AgentLifecyclePolicyDetailsPage() {
           icon={<DismissRegular />}
           aria-label="Close"
           className={styles.closeButton}
-          onClick={() => navigate('/agents/lifecycle-policy')}
+          onClick={() => navigate(returnPath)}
         />
       </div>
 
@@ -255,11 +269,11 @@ export function AgentLifecyclePolicyDetailsPage() {
             <Text style={{ flex: 1 }}>
               Customers with an A365 or E7 license can use Lifecycle Policies in Entra Identity Governance to manage agent lifecycles with additional options.{' '}
               <Link
-                href="#/agents/lifecycle-policy"
+                href={`#${returnPath}`}
                 inline
                 onClick={(event) => {
                   event.preventDefault();
-                  navigate('/agents/lifecycle-policy');
+                  navigate(returnPath);
                 }}
               >
                 Use lifecycle policies to craft custom policies

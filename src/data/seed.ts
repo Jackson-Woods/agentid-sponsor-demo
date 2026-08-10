@@ -7,6 +7,7 @@ import type {
   OwnerSponsorEntry,
   LifecycleWorkflow,
   WorkflowSettings,
+  AgentLifecyclePolicy,
   AgentIdLifecyclePolicy,
   CustomExtension,
 } from '../models/types';
@@ -1016,6 +1017,19 @@ export const workflowSettingsSeed: WorkflowSettings = {
   emailDomain: 'microsoft.com',
   useCompanyBrandingLogo: false,
 };
+
+export const agentLifecyclePoliciesSeed: AgentLifecyclePolicy[] = [
+  {
+    id: 'privileged-agent-attestation',
+    name: 'Privileged agent attestation',
+    description: 'Require periodic attestation and recent activity for selected agents.',
+    enabled: true,
+    scope: 'Specific',
+    selectedAgentIds: [],
+    createdDateTime: '2026-03-14T09:00:00',
+    lastModifiedDateTime: '2026-04-20T09:00:00',
+  },
+];
 
 export const agentIdPolicySeed: AgentIdLifecyclePolicy = {
   enabled: true,

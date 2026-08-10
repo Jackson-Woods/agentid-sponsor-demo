@@ -95,6 +95,17 @@ export interface WorkflowSettings {
 
 export type LifecyclePolicyScope = 'All' | 'Specific' | 'Exclude';
 
+export interface AgentLifecyclePolicy {
+  id: string;
+  name: string;
+  description: string;
+  enabled: boolean;
+  scope: LifecyclePolicyScope;
+  selectedAgentIds: string[];
+  createdDateTime: string;
+  lastModifiedDateTime: string;
+}
+
 export interface AgentIdLifecyclePolicy {
   enabled: boolean;
   createdDateTime: string;

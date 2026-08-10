@@ -26,6 +26,7 @@ import { WorkflowsListPage } from './pages/LifecycleWorkflows/WorkflowsListPage'
 import { CustomExtensionsPage } from './pages/LifecycleWorkflows/CustomExtensionsPage';
 import { WorkflowSettingsPage } from './pages/LifecycleWorkflows/WorkflowSettingsPage';
 import { AgentIdPolicyPage } from './pages/LifecycleWorkflows/AgentPoliciesPage';
+import { NewAgentPolicyPage } from './pages/LifecycleWorkflows/NewAgentPolicyPage';
 import { EnterpriseAppsPage } from './pages/EnterpriseApps/EnterpriseAppsPage';
 import { AppRegistrationsPage } from './pages/AppRegistrations/AppRegistrationsPage';
 import { AppSettingsContext } from './AppSettingsContext';
@@ -83,6 +84,15 @@ export function App() {
                 path="/agents/lifecycle-policy/inactive"
                 element={<AgentLifecyclePolicyDetailsPage />}
               />
+              <Route
+                path="/agents/lifecycle-policy/new"
+                element={
+                  <NewAgentPolicyPage
+                    returnPath="/agents/lifecycle-policy"
+                    requireAgentsFeature
+                  />
+                }
+              />
               <Route path="/agent/:objectId" element={<AgentOverviewPage />} />
               <Route
                 path="/agent/:objectId/owners-sponsors"
@@ -102,6 +112,22 @@ export function App() {
               <Route path="/lifecycle-workflows/custom-extensions" element={<CustomExtensionsPage />} />
               <Route path="/lifecycle-workflows/settings" element={<WorkflowSettingsPage />} />
               <Route path="/lifecycle-workflows/agent-id-policy" element={<AgentIdPolicyPage />} />
+              <Route
+                path="/lifecycle-workflows/agent-id-policy/new"
+                element={
+                  <NewAgentPolicyPage returnPath="/lifecycle-workflows/agent-id-policy" />
+                }
+              />
+              <Route
+                path="/lifecycle-workflows/agent-id-policy/inactive"
+                element={
+                  <AgentLifecyclePolicyDetailsPage
+                    returnPath="/lifecycle-workflows/agent-id-policy"
+                    requireAgentsFeature={false}
+                    requirePremium
+                  />
+                }
+              />
               <Route path="/enterprise-apps" element={<EnterpriseAppsPage />} />
               <Route path="/app-registrations" element={<AppRegistrationsPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />

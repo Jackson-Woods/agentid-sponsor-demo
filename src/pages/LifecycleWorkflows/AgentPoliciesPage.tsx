@@ -20,7 +20,12 @@ import {
 } from '@fluentui/react-icons';
 import { useNavigate } from 'react-router-dom';
 import { useAppSettings } from '../../AppSettingsContext';
-import { getAgentIdPolicy } from '../../services/dataService';
+import type { AgentIdLifecyclePolicy, AgentLifecyclePolicy } from '../../models/types';
+import {
+  getAgentIdPolicy,
+  getAgentLifecyclePolicies,
+  moveAgentLifecyclePolicy,
+} from '../../services/dataService';
 
 const useStyles = makeStyles({
   page: {
@@ -104,7 +109,12 @@ const useStyles = makeStyles({
   priorityArrows: {
     display: 'flex',
     flexDirection: 'column',
-    color: tokens.colorNeutralForeground2,
+  },
+  priorityButton: {
+    minWidth: '20px',
+    width: '20px',
+    height: '18px',
+    padding: 0,
   },
   policyName: {
     display: 'block',
@@ -209,49 +219,49 @@ const useStyles = makeStyles({
   },
 });
 
-const POLICIES = [
-  {
-    priority: 1,
-    name: 'Privileged agent attestation',
-    description: 'Require periodic attestation and recent activity for selected agents.',
-    rules: '2 active',
-    scope: '3 group(s)',
-    created: '2026-03-14',
-    modified: '2026-04-20',
-  },
-  {
-    priority: 2,
-    name: 'Inactive agents (default)',
-    description: 'Disable agent identities inactive for 90 days.',
-    rules: '1 active',
-    scope: 'All agents',
-    created: '2026-03-01',
-    modified: '2026-04-12',
-  },
-];
-
 interface AgentPoliciesTableProps {
+  onNewPolicyClick?: () => void;
   onInactivePolicyClick?: () => void;
 }
 
-export function AgentPoliciesTable({ onInactivePolicyClick }: AgentPoliciesTableProps) {
+function formatDate(value: string): string {
+  return value.slice(0, 10);
+}
+
+function formatScope(policy: AgentLifecyclePolicy): string {
+  if (policy.scope === 'All') return 'All agents';
+  const prefix = policy.scope === 'Exclude' ? 'Exclude' : 'Include';
+  return `${prefix} ${policy.selectedAgentIds.length}`;
+}
+
+export function AgentPoliciesTable({
+  onNewPolicyClick,
+  onInactivePolicyClick,
+}: AgentPoliciesTableProps) {
   const styles = useStyles();
   const { experienceTier } = useAppSettings();
-  const [inactivePolicyEnabled, setInactivePolicyEnabled] = useState(true);
+  const [customPolicies, setCustomPolicies] = useState<AgentLifecyclePolicy[]>([]);
+  const [inactivePolicy, setInactivePolicy] = useState<AgentIdLifecyclePolicy | null>(null);
   const isPremium = experienceTier === 'premium';
-  const visiblePolicies = isPremium
-    ? POLICIES
-    : POLICIES.filter((policy) => policy.name === 'Inactive agents (default)');
 
   useEffect(() => {
     let ignore = false;
-    getAgentIdPolicy().then((policy) => {
-      if (!ignore) setInactivePolicyEnabled(policy.enabled);
+    Promise.all([getAgentLifecyclePolicies(), getAgentIdPolicy()]).then(([policies, defaultPolicy]) => {
+      if (!ignore) {
+        setCustomPolicies(policies);
+        setInactivePolicy(defaultPolicy);
+      }
     });
     return () => {
       ignore = true;
     };
   }, []);
+
+  const handleMove = async (policyId: string, direction: 'up' | 'down') => {
+    setCustomPolicies(await moveAgentLifecyclePolicy(policyId, direction));
+  };
+
+  const visiblePolicies = isPremium ? customPolicies : [];
 
   return (
     <div className={styles.premiumContent}>
@@ -262,7 +272,7 @@ export function AgentPoliciesTable({ onInactivePolicyClick }: AgentPoliciesTable
           placeholder="Search policies..."
         />
         {isPremium && (
-          <Button appearance="primary" icon={<AddRegular />}>
+          <Button appearance="primary" icon={<AddRegular />} onClick={onNewPolicyClick}>
             New policy
           </Button>
         )}
@@ -294,60 +304,108 @@ export function AgentPoliciesTable({ onInactivePolicyClick }: AgentPoliciesTable
           </thead>
           <tbody>
             {visiblePolicies.map((policy, index) => (
-              <tr className={styles.row} key={policy.priority}>
+              <tr className={styles.row} key={policy.id}>
                 <td className={styles.cell}>
                   <div className={styles.priorityCell}>
                     <span>{index + 1}</span>
-                    {isPremium && (
-                      <span className={styles.priorityArrows} aria-hidden="true">
-                        <ArrowUpRegular fontSize={16} />
-                        <ArrowDownRegular fontSize={16} />
+                    <span className={styles.priorityArrows}>
+                      <Button
+                        appearance="subtle"
+                        className={styles.priorityButton}
+                        icon={<ArrowUpRegular fontSize={16} />}
+                        aria-label={`Move ${policy.name} up`}
+                        disabled={index === 0}
+                        onClick={() => handleMove(policy.id, 'up')}
+                      />
+                      <Button
+                        appearance="subtle"
+                        className={styles.priorityButton}
+                        icon={<ArrowDownRegular fontSize={16} />}
+                        aria-label={`Move ${policy.name} down`}
+                        disabled={index === customPolicies.length - 1}
+                        onClick={() => handleMove(policy.id, 'down')}
+                      />
                       </span>
-                    )}
                   </div>
                 </td>
                 <td className={styles.cell}>
-                  <button
-                    className={styles.policyName}
-                    type="button"
-                    onClick={
-                      policy.name === 'Inactive agents (default)'
-                        ? onInactivePolicyClick
-                        : undefined
-                    }
-                  >
+                  <span className={styles.policyName}>
                     {policy.name}
-                  </button>
+                  </span>
                   <Text className={styles.policyDescription}>{policy.description}</Text>
                 </td>
                 <td className={styles.cell}>
-                  <span
-                    className={`${styles.status} ${
-                      policy.name === 'Inactive agents (default)' && !inactivePolicyEnabled
-                        ? styles.statusDisabled
-                        : ''
-                    }`}
-                  >
-                    {policy.name === 'Inactive agents (default)' && !inactivePolicyEnabled
-                      ? 'Disabled'
-                      : 'Enabled'}
+                  <span className={`${styles.status} ${!policy.enabled ? styles.statusDisabled : ''}`}>
+                    {policy.enabled ? 'Enabled' : 'Disabled'}
                   </span>
                 </td>
-                <td className={styles.cell}>{policy.rules}</td>
-                <td className={styles.cell}>{policy.scope}</td>
-                <td className={`${styles.cell} ${styles.date}`}>{policy.created}</td>
-                <td className={`${styles.cell} ${styles.date}`}>{policy.modified}</td>
+                <td className={styles.cell}>1 active</td>
+                <td className={styles.cell}>{formatScope(policy)}</td>
+                <td className={`${styles.cell} ${styles.date}`}>{formatDate(policy.createdDateTime)}</td>
+                <td className={`${styles.cell} ${styles.date}`}>{formatDate(policy.lastModifiedDateTime)}</td>
                 <td className={styles.cell}>
                   <Button
                     appearance="subtle"
                     className={styles.deleteButton}
                     icon={<DeleteRegular />}
                     aria-label={`Delete ${policy.name}`}
-                    disabled={policy.name === 'Inactive agents (default)'}
                   />
                 </td>
               </tr>
             ))}
+            {inactivePolicy && (
+              <tr className={styles.row} key="inactive-agents-default">
+                <td className={styles.cell}>
+                  <div className={styles.priorityCell}>
+                    <span>{visiblePolicies.length + 1}</span>
+                    {isPremium && (
+                      <span className={styles.priorityArrows}>
+                        <Button
+                          appearance="subtle"
+                          className={styles.priorityButton}
+                          icon={<ArrowUpRegular fontSize={16} />}
+                          aria-label="Move Inactive agents (default) up"
+                          disabled
+                        />
+                        <Button
+                          appearance="subtle"
+                          className={styles.priorityButton}
+                          icon={<ArrowDownRegular fontSize={16} />}
+                          aria-label="Move Inactive agents (default) down"
+                          disabled
+                        />
+                      </span>
+                    )}
+                  </div>
+                </td>
+                <td className={styles.cell}>
+                  <button className={styles.policyName} type="button" onClick={onInactivePolicyClick}>
+                    Inactive agents (default)
+                  </button>
+                  <Text className={styles.policyDescription}>
+                    Disable agent identities inactive for 90 days.
+                  </Text>
+                </td>
+                <td className={styles.cell}>
+                  <span className={`${styles.status} ${!inactivePolicy.enabled ? styles.statusDisabled : ''}`}>
+                    {inactivePolicy.enabled ? 'Enabled' : 'Disabled'}
+                  </span>
+                </td>
+                <td className={styles.cell}>1 active</td>
+                <td className={styles.cell}>All agents</td>
+                <td className={`${styles.cell} ${styles.date}`}>{formatDate(inactivePolicy.createdDateTime)}</td>
+                <td className={`${styles.cell} ${styles.date}`}>{formatDate(inactivePolicy.lastModifiedDateTime)}</td>
+                <td className={styles.cell}>
+                  <Button
+                    appearance="subtle"
+                    className={styles.deleteButton}
+                    icon={<DeleteRegular />}
+                    aria-label="Delete Inactive agents (default)"
+                    disabled
+                  />
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -391,7 +449,12 @@ export function AgentIdPolicyPage() {
       </div>
 
       {isPremium ? (
-        <AgentPoliciesTable />
+        <AgentPoliciesTable
+          onNewPolicyClick={() => navigate('/lifecycle-workflows/agent-id-policy/new')}
+          onInactivePolicyClick={() =>
+            navigate('/lifecycle-workflows/agent-id-policy/inactive')
+          }
+        />
       ) : (
         <div className={styles.licenseNotice} role="status">
           <div className={styles.noticeHeader}>

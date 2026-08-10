@@ -94,6 +94,7 @@ export function AgentLifecyclePoliciesPage() {
       </div>
 
       <AgentPoliciesTable
+        onNewPolicyClick={() => navigate('/agents/lifecycle-policy/new')}
         onInactivePolicyClick={() => navigate('/agents/lifecycle-policy/inactive')}
       />
     </div>

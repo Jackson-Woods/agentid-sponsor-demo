@@ -66,7 +66,7 @@ export function PolicyScopePicker({
       >
         {availableScopes.includes('All') && <Radio value="All" label="All agents" />}
         {availableScopes.includes('Specific') && (
-          <Radio value="Specific" label="Specific agents" />
+          <Radio value="Specific" label="Include selected agents" />
         )}
         {availableScopes.includes('Exclude') && (
           <Radio value="Exclude" label="Exclude agents" />
