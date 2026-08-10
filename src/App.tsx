@@ -8,7 +8,8 @@ import {
 import { AppShell } from './components/AppShell/AppShell';
 import { AgentIdOverviewPage } from './pages/AgentIdOverview/AgentIdOverviewPage';
 import { AgentListPage } from './pages/AgentList/AgentListPage';
-import { AgentLifecyclePolicyPage } from './pages/AgentList/AgentLifecyclePolicyPage';
+import { AgentLifecyclePoliciesPage } from './pages/AgentList/AgentLifecyclePoliciesPage';
+import { AgentLifecyclePolicyDetailsPage } from './pages/AgentList/AgentLifecyclePolicyPage';
 import { AgentOverviewPage } from './pages/AgentOverview/AgentOverviewPage';
 import { OwnersAndSponsorsPage } from './pages/OwnersAndSponsors/OwnersAndSponsorsPage';
 import { HomePage } from './pages/Home/HomePage';
@@ -77,7 +78,11 @@ export function App() {
             <Routes>
               <Route path="/" element={<AgentIdOverviewPage />} />
               <Route path="/agents" element={<AgentListPage />} />
-              <Route path="/agents/lifecycle-policy" element={<AgentLifecyclePolicyPage />} />
+              <Route path="/agents/lifecycle-policy" element={<AgentLifecyclePoliciesPage />} />
+              <Route
+                path="/agents/lifecycle-policy/inactive"
+                element={<AgentLifecyclePolicyDetailsPage />}
+              />
               <Route path="/agent/:objectId" element={<AgentOverviewPage />} />
               <Route
                 path="/agent/:objectId/owners-sponsors"

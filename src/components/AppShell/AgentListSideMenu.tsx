@@ -62,7 +62,7 @@ export function AgentListSideMenu() {
 
   const isOverview = location.pathname === '/';
   const isAgentList = location.pathname === '/agents';
-  const isAgentLifecyclePolicy = location.pathname === '/agents/lifecycle-policy';
+  const isAgentLifecyclePolicy = location.pathname.startsWith('/agents/lifecycle-policy');
 
   return (
     <nav className={styles.sidebar} aria-label="Agent ID menu">

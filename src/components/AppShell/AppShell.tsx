@@ -66,7 +66,7 @@ export function AppShell({
   const isAgentList =
     location.pathname === '/' ||
     location.pathname === '/agents' ||
-    location.pathname === '/agents/lifecycle-policy';
+    location.pathname.startsWith('/agents/lifecycle-policy');
   const isGroupsListPage = location.pathname === '/groups' || location.pathname === '/groups/all' || location.pathname === '/groups/new';
   const groupDetailMatch = location.pathname.match(/^\/groups\/(?!all$|new$)([^/]+)/);
   const isGroupDetail = !!groupDetailMatch;

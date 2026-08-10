@@ -376,7 +376,10 @@ export async function updateWorkflowSettings(
 
 export async function getAgentIdPolicy(): Promise<AgentIdLifecyclePolicy> {
   await delay(60);
-  return { ...store.agentIdPolicy };
+  return {
+    ...store.agentIdPolicy,
+    selectedAgentIds: [...store.agentIdPolicy.selectedAgentIds],
+  };
 }
 
 export async function updateAgentIdPolicy(
@@ -386,10 +389,16 @@ export async function updateAgentIdPolicy(
   store.agentIdPolicy = {
     ...store.agentIdPolicy,
     ...patch,
+    selectedAgentIds: patch.selectedAgentIds
+      ? [...patch.selectedAgentIds]
+      : [...store.agentIdPolicy.selectedAgentIds],
     lastModifiedDateTime: new Date().toISOString(),
   };
   saveStore(store);
-  return { ...store.agentIdPolicy };
+  return {
+    ...store.agentIdPolicy,
+    selectedAgentIds: [...store.agentIdPolicy.selectedAgentIds],
+  };
 }
 
 export async function getCustomExtensions(): Promise<CustomExtension[]> {

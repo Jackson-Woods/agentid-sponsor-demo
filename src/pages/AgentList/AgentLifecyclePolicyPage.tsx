@@ -127,7 +127,7 @@ const useStyles = makeStyles({
   },
 });
 
-export function AgentLifecyclePolicyPage() {
+export function AgentLifecyclePolicyDetailsPage() {
   const styles = useStyles();
   const navigate = useNavigate();
   const { showDefaultDisableUx } = useAppSettings();
@@ -162,6 +162,7 @@ export function AgentLifecyclePolicyPage() {
     setPolicy(updated);
     setDraft(updated);
     setSaving(false);
+    navigate('/agents/lifecycle-policy');
   };
 
   return (
@@ -193,7 +194,7 @@ export function AgentLifecyclePolicyPage() {
           icon={<DismissRegular />}
           aria-label="Close"
           className={styles.closeButton}
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/agents/lifecycle-policy')}
         />
       </div>
 
@@ -254,11 +255,11 @@ export function AgentLifecyclePolicyPage() {
             <Text style={{ flex: 1 }}>
               Customers with an A365 or E7 license can use Lifecycle Policies in Entra Identity Governance to manage agent lifecycles with additional options.{' '}
               <Link
-                href="#/lifecycle-workflows/agent-id-policy"
+                href="#/agents/lifecycle-policy"
                 inline
                 onClick={(event) => {
                   event.preventDefault();
-                  navigate('/lifecycle-workflows/agent-id-policy');
+                  navigate('/agents/lifecycle-policy');
                 }}
               >
                 Use lifecycle policies to craft custom policies

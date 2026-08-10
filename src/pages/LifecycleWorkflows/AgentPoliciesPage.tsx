@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   Breadcrumb,
   BreadcrumbButton,
@@ -19,6 +20,7 @@ import {
 } from '@fluentui/react-icons';
 import { useNavigate } from 'react-router-dom';
 import { useAppSettings } from '../../AppSettingsContext';
+import { getAgentIdPolicy } from '../../services/dataService';
 
 const useStyles = makeStyles({
   page: {
@@ -134,6 +136,11 @@ const useStyles = makeStyles({
     fontSize: '12px',
     fontWeight: 600,
   },
+  statusDisabled: {
+    backgroundColor: tokens.colorNeutralBackground5,
+    border: `1px solid ${tokens.colorNeutralStroke1}`,
+    color: '#000000',
+  },
   date: {
     color: tokens.colorNeutralForeground3,
     whiteSpace: 'nowrap',
@@ -223,6 +230,134 @@ const POLICIES = [
   },
 ];
 
+interface AgentPoliciesTableProps {
+  onInactivePolicyClick?: () => void;
+}
+
+export function AgentPoliciesTable({ onInactivePolicyClick }: AgentPoliciesTableProps) {
+  const styles = useStyles();
+  const { experienceTier } = useAppSettings();
+  const [inactivePolicyEnabled, setInactivePolicyEnabled] = useState(true);
+  const isPremium = experienceTier === 'premium';
+  const visiblePolicies = isPremium
+    ? POLICIES
+    : POLICIES.filter((policy) => policy.name === 'Inactive agents (default)');
+
+  useEffect(() => {
+    let ignore = false;
+    getAgentIdPolicy().then((policy) => {
+      if (!ignore) setInactivePolicyEnabled(policy.enabled);
+    });
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  return (
+    <div className={styles.premiumContent}>
+      <div className={styles.toolbar}>
+        <Input
+          className={styles.search}
+          contentBefore={<SearchRegular />}
+          placeholder="Search policies..."
+        />
+        {isPremium && (
+          <Button appearance="primary" icon={<AddRegular />}>
+            New policy
+          </Button>
+        )}
+      </div>
+
+      <div className={styles.tableFrame}>
+        <table className={styles.table} aria-label="Agent lifecycle policies">
+          <colgroup>
+            <col style={{ width: '96px' }} />
+            <col style={{ width: '36%' }} />
+            <col style={{ width: '102px' }} />
+            <col style={{ width: '82px' }} />
+            <col style={{ width: '98px' }} />
+            <col style={{ width: '108px' }} />
+            <col style={{ width: '116px' }} />
+            <col style={{ width: '48px' }} />
+          </colgroup>
+          <thead>
+            <tr className={styles.tableHeader}>
+              <th className={styles.headerCell}>Priority</th>
+              <th className={styles.headerCell}>Name</th>
+              <th className={styles.headerCell}>Status</th>
+              <th className={styles.headerCell}>Rules</th>
+              <th className={styles.headerCell}>Scope</th>
+              <th className={styles.headerCell}>Created</th>
+              <th className={styles.headerCell}>Modified</th>
+              <th aria-label="Actions" />
+            </tr>
+          </thead>
+          <tbody>
+            {visiblePolicies.map((policy, index) => (
+              <tr className={styles.row} key={policy.priority}>
+                <td className={styles.cell}>
+                  <div className={styles.priorityCell}>
+                    <span>{index + 1}</span>
+                    {isPremium && (
+                      <span className={styles.priorityArrows} aria-hidden="true">
+                        <ArrowUpRegular fontSize={16} />
+                        <ArrowDownRegular fontSize={16} />
+                      </span>
+                    )}
+                  </div>
+                </td>
+                <td className={styles.cell}>
+                  <button
+                    className={styles.policyName}
+                    type="button"
+                    onClick={
+                      policy.name === 'Inactive agents (default)'
+                        ? onInactivePolicyClick
+                        : undefined
+                    }
+                  >
+                    {policy.name}
+                  </button>
+                  <Text className={styles.policyDescription}>{policy.description}</Text>
+                </td>
+                <td className={styles.cell}>
+                  <span
+                    className={`${styles.status} ${
+                      policy.name === 'Inactive agents (default)' && !inactivePolicyEnabled
+                        ? styles.statusDisabled
+                        : ''
+                    }`}
+                  >
+                    {policy.name === 'Inactive agents (default)' && !inactivePolicyEnabled
+                      ? 'Disabled'
+                      : 'Enabled'}
+                  </span>
+                </td>
+                <td className={styles.cell}>{policy.rules}</td>
+                <td className={styles.cell}>{policy.scope}</td>
+                <td className={`${styles.cell} ${styles.date}`}>{policy.created}</td>
+                <td className={`${styles.cell} ${styles.date}`}>{policy.modified}</td>
+                <td className={styles.cell}>
+                  <Button
+                    appearance="subtle"
+                    className={styles.deleteButton}
+                    icon={<DeleteRegular />}
+                    aria-label={`Delete ${policy.name}`}
+                    disabled={policy.name === 'Inactive agents (default)'}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <Text className={styles.footnote}>
+        Policies are evaluated in priority order. Higher priority policies take precedence.
+      </Text>
+    </div>
+  );
+}
+
 export function AgentIdPolicyPage() {
   const styles = useStyles();
   const navigate = useNavigate();
@@ -234,12 +369,14 @@ export function AgentIdPolicyPage() {
       <div className={styles.headingBand}>
         <Breadcrumb size="small">
           <BreadcrumbItem>
-            <BreadcrumbButton onClick={() => navigate('/home')}>Home</BreadcrumbButton>
+            <BreadcrumbButton onClick={() => navigate('/lifecycle-workflows')}>
+              Lifecycle workflows
+            </BreadcrumbButton>
           </BreadcrumbItem>
           <BreadcrumbDivider />
           <BreadcrumbItem>
-            <BreadcrumbButton onClick={() => navigate('/lifecycle-workflows')}>
-              Lifecycle workflows
+            <BreadcrumbButton onClick={() => navigate('/lifecycle-workflows/agent-id-policy')}>
+              Policies
             </BreadcrumbButton>
           </BreadcrumbItem>
           <BreadcrumbDivider />
@@ -254,84 +391,7 @@ export function AgentIdPolicyPage() {
       </div>
 
       {isPremium ? (
-        <div className={styles.premiumContent}>
-          <div className={styles.toolbar}>
-            <Input
-              className={styles.search}
-              contentBefore={<SearchRegular />}
-              placeholder="Search policies..."
-            />
-            <Button appearance="primary" icon={<AddRegular />}>
-              New policy
-            </Button>
-          </div>
-
-          <div className={styles.tableFrame}>
-            <table className={styles.table} aria-label="Agent lifecycle policies">
-              <colgroup>
-                <col style={{ width: '96px' }} />
-                <col style={{ width: '36%' }} />
-                <col style={{ width: '102px' }} />
-                <col style={{ width: '82px' }} />
-                <col style={{ width: '98px' }} />
-                <col style={{ width: '108px' }} />
-                <col style={{ width: '116px' }} />
-                <col style={{ width: '48px' }} />
-              </colgroup>
-              <thead>
-                <tr className={styles.tableHeader}>
-                  <th className={styles.headerCell}>Priority</th>
-                  <th className={styles.headerCell}>Name</th>
-                  <th className={styles.headerCell}>Status</th>
-                  <th className={styles.headerCell}>Rules</th>
-                  <th className={styles.headerCell}>Scope</th>
-                  <th className={styles.headerCell}>Created</th>
-                  <th className={styles.headerCell}>Modified</th>
-                  <th aria-label="Actions" />
-                </tr>
-              </thead>
-              <tbody>
-                {POLICIES.map((policy) => (
-                  <tr className={styles.row} key={policy.priority}>
-                    <td className={styles.cell}>
-                      <div className={styles.priorityCell}>
-                        <span>{policy.priority}</span>
-                        <span className={styles.priorityArrows} aria-hidden="true">
-                          <ArrowUpRegular fontSize={16} />
-                          <ArrowDownRegular fontSize={16} />
-                        </span>
-                      </div>
-                    </td>
-                    <td className={styles.cell}>
-                      <button className={styles.policyName} type="button">
-                        {policy.name}
-                      </button>
-                      <Text className={styles.policyDescription}>{policy.description}</Text>
-                    </td>
-                    <td className={styles.cell}>
-                      <span className={styles.status}>Enabled</span>
-                    </td>
-                    <td className={styles.cell}>{policy.rules}</td>
-                    <td className={styles.cell}>{policy.scope}</td>
-                    <td className={`${styles.cell} ${styles.date}`}>{policy.created}</td>
-                    <td className={`${styles.cell} ${styles.date}`}>{policy.modified}</td>
-                    <td className={styles.cell}>
-                      <Button
-                        appearance="subtle"
-                        className={styles.deleteButton}
-                        icon={<DeleteRegular />}
-                        aria-label={`Delete ${policy.name}`}
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <Text className={styles.footnote}>
-            Policies are evaluated in priority order. Higher priority policies take precedence.
-          </Text>
-        </div>
+        <AgentPoliciesTable />
       ) : (
         <div className={styles.licenseNotice} role="status">
           <div className={styles.noticeHeader}>
