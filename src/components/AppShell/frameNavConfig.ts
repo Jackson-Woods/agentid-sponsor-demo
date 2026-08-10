@@ -75,7 +75,7 @@ export const favoritesSection: NavSection = {
   isCollapsible: true,
   defaultExpanded: true,
   items: [
-    { label: 'Agent ID (Preview)', icon: ContactCardRegular, route: '/', isFavorite: true },
+    { label: 'Agents', icon: ContactCardRegular, route: '/', isFavorite: true },
     { label: 'Users', icon: PersonRegular, route: '/users', isFavorite: true },
     { label: 'Groups', icon: PeopleRegular, route: '/groups', isFavorite: true },
   ],
@@ -92,7 +92,7 @@ export const navSections: NavSection[] = [
       { label: 'Users', icon: PersonRegular, route: '/users' },
       { label: 'Groups', icon: PeopleRegular, route: '/groups' },
       { label: 'Devices', icon: PhoneLaptopRegular },
-      { label: 'Agent ID (Preview)', icon: ContactCardRegular, route: '/' },
+      { label: 'Agents', icon: ContactCardRegular, route: '/' },
       { label: 'Enterprise apps', icon: BuildingMultipleRegular, route: '/enterprise-apps' },
       { label: 'App registrations', icon: AppGenericRegular, route: '/app-registrations' },
       { label: 'Roles & admins', icon: ShieldPersonRegular },

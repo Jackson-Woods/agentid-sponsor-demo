@@ -8,7 +8,7 @@ import {
   GridDotsRegular,
 } from '@fluentui/react-icons';
 import { signedInUser } from '../../data/seed';
-import type { DefaultDisableVariant, ExperienceTier } from '../../AppSettingsContext';
+import type { ExperienceTier } from '../../AppSettingsContext';
 
 const useStyles = makeStyles({
   header: {
@@ -100,8 +100,6 @@ interface TopNavProps {
   onTogglePrefilterSponsors: () => void;
   showDefaultDisableUx: boolean;
   onToggleShowDefaultDisableUx: () => void;
-  defaultDisableVariant: DefaultDisableVariant;
-  onChangeDefaultDisableVariant: (v: DefaultDisableVariant) => void;
   experienceTier: ExperienceTier;
   onChangeExperienceTier: (v: ExperienceTier) => void;
 }
@@ -115,8 +113,6 @@ export function TopNav({
   onTogglePrefilterSponsors,
   showDefaultDisableUx,
   onToggleShowDefaultDisableUx,
-  defaultDisableVariant,
-  onChangeDefaultDisableVariant,
   experienceTier,
   onChangeExperienceTier,
 }: TopNavProps) {
@@ -188,31 +184,11 @@ export function TopNav({
               />
               <Text style={{ fontSize: '13px', fontWeight: 600, marginTop: '8px', marginBottom: '4px', color: tokens.colorNeutralForeground1 }} block>Features</Text>
               <Switch
-                label="Show default disable UX for agents"
+                label="Show inactivity policy UX in Agents"
                 labelPosition="before"
                 checked={showDefaultDisableUx}
                 onChange={onToggleShowDefaultDisableUx}
               />
-              {showDefaultDisableUx && (
-                <div style={{ marginLeft: '12px', marginTop: '4px', marginBottom: '4px' }}>
-                  <Text style={{ fontSize: '12px', color: tokens.colorNeutralForeground2, marginBottom: '2px', display: 'block' }}>
-                    Default disable UI
-                  </Text>
-                  <RadioGroup
-                    value={String(defaultDisableVariant)}
-                    onChange={(_, d) => {
-                      const n = parseInt(d.value, 10);
-                      if (n === 1 || n === 2 || n === 3) {
-                        onChangeDefaultDisableVariant(n);
-                      }
-                    }}
-                  >
-                    <Radio value="1" label="Parallel page" />
-                    <Radio value="2" label="Integrated mode picker" />
-                    <Radio value="3" label="Two sections" />
-                  </RadioGroup>
-                </div>
-              )}
               <Switch
                 label="Limit group sponsors"
                 labelPosition="before"

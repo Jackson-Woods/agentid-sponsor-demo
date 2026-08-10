@@ -249,7 +249,7 @@ export function AgentOverviewPage() {
           </BreadcrumbItem>
           <BreadcrumbDivider />
           <BreadcrumbItem>
-            <BreadcrumbButton onClick={() => navigate('/agents')}>Agent ID | All agent identities</BreadcrumbButton>
+            <BreadcrumbButton onClick={() => navigate('/agents')}>Agents | Agent identities</BreadcrumbButton>
           </BreadcrumbItem>
         </Breadcrumb>
         <div className={styles.titleRow}>

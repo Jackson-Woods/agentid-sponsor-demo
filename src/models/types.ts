@@ -117,8 +117,7 @@ export interface AgentIdLifecyclePolicy {
   inactivitySecondNotificationDays?: number;
   inactivityThirdNotificationDays?: number;
   notifyOwners?: boolean;
-  // Variant 2 — which lifecycle modes are active when integrated mode picker
-  // is used. Independent of variant toggle persistence.
+  // Lifecycle modes exposed by the integrated policy layout.
   lifecycleModes?: { reconfirm: boolean; inactivity: boolean };
 }
 

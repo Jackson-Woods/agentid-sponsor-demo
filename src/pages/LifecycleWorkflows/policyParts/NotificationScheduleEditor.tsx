@@ -95,7 +95,7 @@ export function NotificationScheduleEditor({
   disabled,
   onChangeCustomize,
   onChangeDays,
-  infoText = 'By default, Email notifications will be sent automatically 30, 15, and 1 day prior to agent identity is disabled.',
+  infoText = 'Email notifications will be sent 30 days prior to the agent identity being disabled.',
   title = 'Notification schedule',
   showTitle = true,
   trailingInfoText,
@@ -139,56 +139,56 @@ export function NotificationScheduleEditor({
 
       {customize && (
         <>
-          {days.map((value, idx) => {
-            const options = POSITION_OPTIONS[idx] ?? DAYS_OPTIONS;
-            return (
-              <div key={idx} className={styles.notificationRow}>
-                <Text className={styles.notificationLabel}>
-                  {ORDINAL_LABELS[idx]} notification:
-                </Text>
-                <Dropdown
-                  className={styles.daysDropdown}
-                  value={String(value)}
-                  selectedOptions={[String(value)]}
-                  disabled={disabled}
-                  onOptionSelect={(_, d) => {
-                    if (!d.optionValue) return;
-                    const next = [...days];
-                    next[idx] = parseInt(d.optionValue, 10);
-                    writeDays(next);
-                  }}
-                >
-                  {options.map((opt) => (
-                    <Option key={opt} value={opt}>
-                      {opt}
-                    </Option>
-                  ))}
-                </Dropdown>
-                <Text style={{ fontSize: '13px' }}>Days before</Text>
-                {idx > 0 && (
-                  <Button
-                    appearance="subtle"
-                    disabled={disabled}
-                    icon={<DeleteRegular style={{ color: tokens.colorBrandForeground1 }} />}
-                    aria-label={`Remove ${ORDINAL_LABELS[idx].toLowerCase()} notification`}
-                    onClick={() => removeAt(idx)}
-                  />
-                )}
-              </div>
-            );
-          })}
+              {days.map((value, idx) => {
+                const options = POSITION_OPTIONS[idx] ?? DAYS_OPTIONS;
+                return (
+                  <div key={idx} className={styles.notificationRow}>
+                    <Text className={styles.notificationLabel}>
+                      {ORDINAL_LABELS[idx]} notification:
+                    </Text>
+                    <Dropdown
+                      className={styles.daysDropdown}
+                      value={String(value)}
+                      selectedOptions={[String(value)]}
+                      disabled={disabled}
+                      onOptionSelect={(_, d) => {
+                        if (!d.optionValue) return;
+                        const next = [...days];
+                        next[idx] = parseInt(d.optionValue, 10);
+                        writeDays(next);
+                      }}
+                    >
+                      {options.map((opt) => (
+                        <Option key={opt} value={opt}>
+                          {opt}
+                        </Option>
+                      ))}
+                    </Dropdown>
+                    <Text style={{ fontSize: '13px' }}>Days before</Text>
+                    {idx > 0 && (
+                      <Button
+                        appearance="subtle"
+                        disabled={disabled}
+                        icon={<DeleteRegular style={{ color: tokens.colorBrandForeground1 }} />}
+                        aria-label={`Remove ${ORDINAL_LABELS[idx].toLowerCase()} notification`}
+                        onClick={() => removeAt(idx)}
+                      />
+                    )}
+                  </div>
+                );
+              })}
 
-          {days.length < 3 && (
-            <div className={styles.addNotificationRow}>
-              <Button
-                disabled={disabled}
-                icon={<AddRegular style={{ color: tokens.colorBrandForeground1 }} />}
-                onClick={addNotification}
-              >
-                Add notification
-              </Button>
-            </div>
-          )}
+              {days.length < 3 && (
+                <div className={styles.addNotificationRow}>
+                  <Button
+                    disabled={disabled}
+                    icon={<AddRegular style={{ color: tokens.colorBrandForeground1 }} />}
+                    onClick={addNotification}
+                  >
+                    Add notification
+                  </Button>
+                </div>
+              )}
         </>
       )}
 

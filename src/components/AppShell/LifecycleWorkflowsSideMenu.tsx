@@ -10,7 +10,6 @@ import {
   WrenchRegular,
   HeadsetRegular,
 } from '@fluentui/react-icons';
-import { useAppSettings } from '../../AppSettingsContext';
 
 const useStyles = makeStyles({
   sidebar: {
@@ -63,14 +62,11 @@ export function LifecycleWorkflowsSideMenu() {
   const styles = useStyles();
   const location = useLocation();
   const navigate = useNavigate();
-  const { showDefaultDisableUx, defaultDisableVariant } = useAppSettings();
-  const showParallelDefaultDisable = showDefaultDisableUx && defaultDisableVariant === 1;
 
   const path = location.pathname;
   const isOverview = path === '/lifecycle-workflows';
   const isWorkflows = path === '/lifecycle-workflows/workflows';
   const isAgentIdPolicy = path === '/lifecycle-workflows/agent-id-policy';
-  const isDefaultDisable = path === '/lifecycle-workflows/default-disable';
   const isCustomExtensions = path === '/lifecycle-workflows/custom-extensions';
   const isSettings = path === '/lifecycle-workflows/settings';
 
@@ -105,15 +101,6 @@ export function LifecycleWorkflowsSideMenu() {
         <SettingsRegular className={styles.menuIcon} fontSize={16} />
         Agent ID (Preview)
       </button>
-      {showParallelDefaultDisable && (
-        <button
-          className={`${styles.menuItem} ${isDefaultDisable ? styles.active : ''}`}
-          onClick={() => navigate('/lifecycle-workflows/default-disable')}
-        >
-          <SettingsRegular className={styles.menuIcon} fontSize={16} />
-          Default Disable (Preview)
-        </button>
-      )}
 
       <Text className={styles.groupTitle}>Manage</Text>
       <button

@@ -8,6 +8,7 @@ import {
 import { AppShell } from './components/AppShell/AppShell';
 import { AgentIdOverviewPage } from './pages/AgentIdOverview/AgentIdOverviewPage';
 import { AgentListPage } from './pages/AgentList/AgentListPage';
+import { AgentLifecyclePolicyPage } from './pages/AgentList/AgentLifecyclePolicyPage';
 import { AgentOverviewPage } from './pages/AgentOverview/AgentOverviewPage';
 import { OwnersAndSponsorsPage } from './pages/OwnersAndSponsors/OwnersAndSponsorsPage';
 import { HomePage } from './pages/Home/HomePage';
@@ -23,19 +24,17 @@ import { LifecycleWorkflowsPage } from './pages/LifecycleWorkflows/LifecycleWork
 import { WorkflowsListPage } from './pages/LifecycleWorkflows/WorkflowsListPage';
 import { CustomExtensionsPage } from './pages/LifecycleWorkflows/CustomExtensionsPage';
 import { WorkflowSettingsPage } from './pages/LifecycleWorkflows/WorkflowSettingsPage';
-import { AgentIdPolicyPage } from './pages/LifecycleWorkflows/AgentIdPolicyPage';
-import { DefaultDisablePage } from './pages/LifecycleWorkflows/DefaultDisablePage';
+import { AgentIdPolicyPage } from './pages/LifecycleWorkflows/AgentPoliciesPage';
 import { EnterpriseAppsPage } from './pages/EnterpriseApps/EnterpriseAppsPage';
 import { AppRegistrationsPage } from './pages/AppRegistrations/AppRegistrationsPage';
 import { AppSettingsContext } from './AppSettingsContext';
-import type { DefaultDisableVariant, ExperienceTier } from './AppSettingsContext';
+import type { ExperienceTier } from './AppSettingsContext';
 
 export function App() {
   const [isDark, setIsDark] = useState(false);
   const [limitGroupSponsors, setLimitGroupSponsors] = useState(false);
   const [prefilterSponsors, setPrefilterSponsors] = useState(false);
   const [showDefaultDisableUx, setShowDefaultDisableUx] = useState(false);
-  const [defaultDisableVariant, setDefaultDisableVariant] = useState<DefaultDisableVariant>(1);
   const [experienceTier, setExperienceTier] = useState<ExperienceTier>('premium');
 
   const settingsValue = useMemo(
@@ -44,7 +43,6 @@ export function App() {
       prefilterSponsors,
       isDark,
       showDefaultDisableUx,
-      defaultDisableVariant,
       experienceTier,
     }),
     [
@@ -52,7 +50,6 @@ export function App() {
       prefilterSponsors,
       isDark,
       showDefaultDisableUx,
-      defaultDisableVariant,
       experienceTier,
     ],
   );
@@ -74,14 +71,13 @@ export function App() {
             onTogglePrefilterSponsors={() => setPrefilterSponsors((v) => !v)}
             showDefaultDisableUx={showDefaultDisableUx}
             onToggleShowDefaultDisableUx={() => setShowDefaultDisableUx((v) => !v)}
-            defaultDisableVariant={defaultDisableVariant}
-            onChangeDefaultDisableVariant={setDefaultDisableVariant}
             experienceTier={experienceTier}
             onChangeExperienceTier={setExperienceTier}
           >
             <Routes>
               <Route path="/" element={<AgentIdOverviewPage />} />
               <Route path="/agents" element={<AgentListPage />} />
+              <Route path="/agents/lifecycle-policy" element={<AgentLifecyclePolicyPage />} />
               <Route path="/agent/:objectId" element={<AgentOverviewPage />} />
               <Route
                 path="/agent/:objectId/owners-sponsors"
@@ -101,7 +97,6 @@ export function App() {
               <Route path="/lifecycle-workflows/custom-extensions" element={<CustomExtensionsPage />} />
               <Route path="/lifecycle-workflows/settings" element={<WorkflowSettingsPage />} />
               <Route path="/lifecycle-workflows/agent-id-policy" element={<AgentIdPolicyPage />} />
-              <Route path="/lifecycle-workflows/default-disable" element={<DefaultDisablePage />} />
               <Route path="/enterprise-apps" element={<EnterpriseAppsPage />} />
               <Route path="/app-registrations" element={<AppRegistrationsPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />

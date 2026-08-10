@@ -9,7 +9,7 @@ import { GroupDetailSideMenu } from './GroupDetailSideMenu';
 import { UsersSideMenu } from './UsersSideMenu';
 import { LifecycleWorkflowsSideMenu } from './LifecycleWorkflowsSideMenu';
 import { FrameSideNav } from './FrameSideNav';
-import type { DefaultDisableVariant, ExperienceTier } from '../../AppSettingsContext';
+import type { ExperienceTier } from '../../AppSettingsContext';
 
 const useStyles = makeStyles({
   root: {
@@ -40,8 +40,6 @@ interface AppShellProps {
   onTogglePrefilterSponsors: () => void;
   showDefaultDisableUx: boolean;
   onToggleShowDefaultDisableUx: () => void;
-  defaultDisableVariant: DefaultDisableVariant;
-  onChangeDefaultDisableVariant: (v: DefaultDisableVariant) => void;
   experienceTier: ExperienceTier;
   onChangeExperienceTier: (v: ExperienceTier) => void;
 }
@@ -56,8 +54,6 @@ export function AppShell({
   onTogglePrefilterSponsors,
   showDefaultDisableUx,
   onToggleShowDefaultDisableUx,
-  defaultDisableVariant,
-  onChangeDefaultDisableVariant,
   experienceTier,
   onChangeExperienceTier,
 }: AppShellProps) {
@@ -67,7 +63,10 @@ export function AppShell({
   // Show side menu only when viewing a specific agent
   const agentMatch = location.pathname.match(/^\/agent\/([^/]+)/);
   const agentId = agentMatch?.[1];
-  const isAgentList = location.pathname === '/' || location.pathname === '/agents';
+  const isAgentList =
+    location.pathname === '/' ||
+    location.pathname === '/agents' ||
+    location.pathname === '/agents/lifecycle-policy';
   const isGroupsListPage = location.pathname === '/groups' || location.pathname === '/groups/all' || location.pathname === '/groups/new';
   const groupDetailMatch = location.pathname.match(/^\/groups\/(?!all$|new$)([^/]+)/);
   const isGroupDetail = !!groupDetailMatch;
@@ -85,8 +84,6 @@ export function AppShell({
         onTogglePrefilterSponsors={onTogglePrefilterSponsors}
         showDefaultDisableUx={showDefaultDisableUx}
         onToggleShowDefaultDisableUx={onToggleShowDefaultDisableUx}
-        defaultDisableVariant={defaultDisableVariant}
-        onChangeDefaultDisableVariant={onChangeDefaultDisableVariant}
         experienceTier={experienceTier}
         onChangeExperienceTier={onChangeExperienceTier}
       />

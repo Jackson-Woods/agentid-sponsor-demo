@@ -349,7 +349,7 @@ export function AgentIdOverviewPage() {
         </Breadcrumb>
         <div className={styles.titleRow}>
           <InfoRegular fontSize={28} style={{ color: tokens.colorBrandForeground1 }} />
-          <Text className={styles.title}>Agent ID | Overview</Text>
+          <Text className={styles.title}>Agents | Overview</Text>
         </div>
         <Text className={styles.subtitle} block>
           Manage and monitor agent identities

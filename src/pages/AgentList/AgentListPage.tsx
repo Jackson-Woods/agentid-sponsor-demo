@@ -220,7 +220,7 @@ export function AgentListPage() {
         </Breadcrumb>
         <div className={styles.titleRow}>
           <AgentCardIcon fontSize={28} />
-          <Text className={styles.title}>Agent ID | All agent identities</Text>
+          <Text className={styles.title}>Agents | Agent identities</Text>
         </div>
         <Text className={styles.subtitle} block>
           Manage and monitor agent identities

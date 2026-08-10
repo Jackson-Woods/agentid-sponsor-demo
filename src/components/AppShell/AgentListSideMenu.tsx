@@ -4,9 +4,11 @@ import {
   SearchRegular,
   InfoRegular,
   AppsRegular,
+  SettingsRegular,
   DoorArrowLeftRegular,
 } from '@fluentui/react-icons';
-import { AgentCardIcon, InventoryMenuIcon } from '../shared/SvgIcon';
+import { AgentCardIcon } from '../shared/SvgIcon';
+import { useAppSettings } from '../../AppSettingsContext';
 
 const useStyles = makeStyles({
   sidebar: {
@@ -56,9 +58,11 @@ export function AgentListSideMenu() {
   const styles = useStyles();
   const location = useLocation();
   const navigate = useNavigate();
+  const { showDefaultDisableUx } = useAppSettings();
 
   const isOverview = location.pathname === '/';
   const isAgentList = location.pathname === '/agents';
+  const isAgentLifecyclePolicy = location.pathname === '/agents/lifecycle-policy';
 
   return (
     <nav className={styles.sidebar} aria-label="Agent ID menu">
@@ -76,21 +80,30 @@ export function AgentListSideMenu() {
         <InfoRegular className={styles.menuIcon} fontSize={16} />
         Overview
       </button>
+      <button className={`${styles.menuItem}`}>
+        <AppsRegular className={styles.menuIcon} fontSize={16} />
+        Agent blueprints
+      </button>
       <button
         className={`${styles.menuItem} ${isAgentList ? styles.active : ''}`}
         onClick={() => navigate('/agents')}
       >
         <AgentCardIcon className={styles.menuIcon} fontSize={16} />
-        All agent identities
+        Agent identities
       </button>
-      <button className={`${styles.menuItem}`}>
-        <InventoryMenuIcon className={styles.menuIcon} fontSize={16} />
-        Agent registry
-      </button>
-      <button className={`${styles.menuItem}`}>
-        <AppsRegular className={styles.menuIcon} fontSize={16} />
-        Agent collections
-      </button>
+
+      {showDefaultDisableUx && (
+        <>
+          <Text className={styles.groupTitle}>Policies</Text>
+          <button
+            className={`${styles.menuItem} ${isAgentLifecyclePolicy ? styles.active : ''}`}
+            onClick={() => navigate('/agents/lifecycle-policy')}
+          >
+            <SettingsRegular className={styles.menuIcon} fontSize={16} />
+            Agent lifecycle (Preview)
+          </button>
+        </>
+      )}
 
       <Text className={styles.groupTitle}>Activity</Text>
       <button className={`${styles.menuItem}`}>
